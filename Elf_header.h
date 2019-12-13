@@ -18,7 +18,7 @@ void print_codage_type(Elf32_Ehdr *entete);
 //affichhage architecture machine
 void print_v_machine(Elf32_Ehdr *entete);
 
-//affichage version
+//affichage version du fichier objet
 void print_e_version(Elf32_Ehdr *entete);
 
 //affichage de l'entete
@@ -26,5 +26,8 @@ void print_header(Elf32_Ehdr *entete);
 
 //print OS
 void print_OS(Elf32_Ehdr *entete);
+
+//affiche la version courante 
+void print_version(Elf32_Ehdr *entete);
 
 #endif 
