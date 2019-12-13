@@ -8,7 +8,8 @@ Elf32_Ehdr *lecture_entete (FILE *felf);
 
 
 //convert little endian
-int32_t value32(Elf32_Ehdr h, int32_t value);
+int32_t value_32(int32_t value);
+int16_t value_16(int16_t value);
 
 //ajout a partir dici 
 //affichage du type
