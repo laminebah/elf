@@ -4,6 +4,13 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+
+//convert little endian
+int32_t value32(Elf32_Ehdr h, int32_t value)
+{
+	
+}
+
 // -1 en cas d'erreur si les nombres magiques sont bons
 int ElfId (FILE *felf,Elf32_Ehdr * elf_head) {
 	int resultat  = 0;
@@ -175,15 +182,15 @@ void print_type(Elf32_Ehdr *entete)
 {
     switch (entete->e_type)
     {
-        case ET_NONE:   printf("NONE");
+        case ET_NONE:   printf("NONE (Type du fichier inconnu)");
             break;
-        case ET_REL:    printf("REL");
+        case ET_REL:    printf("REL (Fichier de réadressage) ");
             break;
-        case ET_EXEC:   printf("EXEC");
+        case ET_EXEC:   printf("EXEC (EXE (Fichier executable) ");
             break;
-        case ET_DYN:    printf("DYN");
+        case ET_DYN:    printf("DYN (Objet partagé)");
             break;
-        case ET_CORE:   printf("CORE");
+        case ET_CORE:   printf("CORE (Objet Core) ");
             break;
         case ET_LOPROC: printf("LOPROC");
             break;
@@ -207,7 +214,8 @@ void print_classe_type(Elf32_Ehdr *entete)
         case ELFCLASS64: printf("ELF64");
         default: 
             break;
-        }
+    }
+	printf("\n");
 }
 
 //affichage du type de codage
@@ -217,13 +225,14 @@ void print_codage_type(Elf32_Ehdr *entete)
     {
         case ELFDATANONE: printf("Invalid data encoding");
             break;
-        case ELFDATA2LSB: printf("Complement à 2, systeme à octets de poids fort d'abord (big endian)");
+        case ELFDATA2LSB: printf("Complement à 2, systeme à octets de poids faible d'abord (little endian)");
             break;
-        case ELFDATA2MSB: printf("Complement à 2, systeme à octets de poids faible d'abord (little endian)");
+        case ELFDATA2MSB: printf("Complement à 2, systeme à octets de poids fort d'abord (big endian)");
             break;
         default:
             break;
     }
+	printf("\n");
 }
 
 //affichhage architecture machine
@@ -252,6 +261,7 @@ void print_v_machine(Elf32_Ehdr *entete)
         default: printf("RESERVED");
             break;
     }
+	printf("\n");
 }
 
 //print OS
@@ -273,19 +283,23 @@ void print_OS(Elf32_Ehdr *entete)
 void print_e_version(Elf32_Ehdr *entete)
 {
     if(entete->e_version == EV_NONE)
-        printf("0");
-    else if(entete->e_version == EV_CURRENT)
-        printf("1");
-    else 
-        printf(" ");
+	{
+        printf("0\n");
+	}
+    if(entete->e_version == EV_CURRENT)
+	{
+        printf("1\n");
+	}
+	printf(" \n");
 }
 
 //affichage de la version courant
-void aff_version (Elf32_Ehdr *entete) {
+void print_version (Elf32_Ehdr *entete) {
 	if (entete -> e_ident [EI_VERSION] == EV_NONE) 
         printf ("%d (invalid)\n",entete -> e_ident [EI_VERSION]);
 	if (entete -> e_ident [EI_VERSION] == EV_CURRENT) 
         printf ("%d (current)\n",entete -> e_ident [EI_VERSION]);
+	printf("\n");
 }
 
 
@@ -293,25 +307,25 @@ void aff_version (Elf32_Ehdr *entete) {
 void print_header(Elf32_Ehdr *entete)
 {
     printf("En-tête ELF: \n");
-    printf("Magique: ");        print_e_ident(entete);
-    printf("Classe: ");         print_classe_type(entete);
-    printf("Données: ");        print_codage_type(entete);
-    printf("Version: ");        print_e_version(entete);
-    printf("OS/ABI: \n");       print_OS(entete);
-    printf("Version ABI: %d \n", entete->e_ident[EI_ABIVERSION]);
-    printf("Type: \n");         print_type(entete);
-    printf("Machine: \n");      print_v_machine(entete);
-    printf("Version: \n");      print_version(entete *entete);
-    printf("Adresse du point d'entrée: %0x \n", entete->e_entry);
-    printf("Début des en-tetes de programmes: %d (octets dans le fichier)\n", entete->e_phoff);
-    printf("Début des en-tetes de section: %d (octets dans le fichier)\n", entete->e_shoff);
-    printf("Fanions: %0x \n", entete->e_flags);
-    printf("Taille de cet en-tete: %d (octets)\n", entete->e_ehsize);
-    printf("Taille de l'entete du programme: %d (octets) \n", entete->e_phentsize);
-    printf("Nombre d'en-tete du programme: %d \n", entete->e_phnum);
-    printf("Taille des en-tetes de section: %d (octets) \n", entete->e_shentsize);
-    printf("Nombre d'en-tete de section: %d\n", entete->e_shnum);
-    printf("Table d'index des chaines d'en-tete de section: %d\n", entete->e_shstrndx);
+    printf("Magique: \t\t");        print_e_ident(entete);
+    printf("Classe: \t\t\t\t");         print_classe_type(entete);
+    printf("Données: \t\t\t\t");        print_codage_type(entete);
+    printf("Version: \t\t\t\t");        print_version(entete);
+    printf("OS/ABI: \t\t\t\t");       print_OS(entete);
+    printf("Version ABI: \t\t\t\t %d \n", entete->e_ident[EI_ABIVERSION]);
+    printf("Type: \t\t\t\t\t");         print_type(entete);
+    printf("Machine: \t\t\t\t");      print_v_machine(entete);
+    printf("Version: \t\t\t\t");      print_e_version(entete);
+    printf("Adresse du point d'entrée: \t\t %0x \n", entete->e_entry);
+    printf("Début des en-tetes de programmes: \t %d (octets dans le fichier)\n", entete->e_phoff);
+    printf("Début des en-tetes de section: \t\t %d (octets dans le fichier)\n", entete->e_shoff);
+    printf("Fanions: \t\t\t\t %0x \n", entete->e_flags);
+    printf("Taille de cet en-tete: \t\t\t %d (octets)\n", entete->e_ehsize);
+    printf("Taille de l'entete du programme: \t %d (octets) \n", entete->e_phentsize);
+    printf("Nombre d'en-tete du programme: \t\t %d \n", entete->e_phnum);
+    printf("Taille des en-tetes de section: \t %d (octets) \n", entete->e_shentsize);
+    printf("Nombre d'en-tete de section: \t\t %d\n", entete->e_shnum);
+    printf("Table d'index des chaines d'en-tete de section: \t %d\n", entete->e_shstrndx);
     printf("\n");
 }
 
