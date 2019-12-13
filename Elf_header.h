@@ -3,8 +3,8 @@
 #include <elf.h>
 #include <stdio.h>
 #include "util.h"
-int ElfId (FILE *felf,Elf32_Ehdr * elf_head);
-Elf32_Ehdr *lecture_entete (FILE *felf);
+int ElfId (Elf32_Ehdr * elf_head);
+Elf32_Ehdr * lecture_entete (FILE *felf);
 
 
 //convert little endian
@@ -37,3 +37,4 @@ void print_OS(Elf32_Ehdr *entete);
 void print_version(Elf32_Ehdr *entete);
 
 #endif 
+
