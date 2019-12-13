@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include "util.h"
 
 int32_t value_32(int32_t value)
 {
@@ -19,170 +20,55 @@ int16_t value_16(int16_t value)
 }
 
 // -1 en cas d'erreur si les nombres magiques sont bons
-int ElfId (FILE *felf,Elf32_Ehdr * elf_head) {
+int ElfId (Elf32_Ehdr * elf_head) {
 	int resultat  = 0;
-	int c;
-	//
-	if ((c=fgetc(felf)) < 0) return -1;
-	if (c != ELFMAG0) return -1;
-	elf_head -> e_ident [EI_MAG0] = c;
-	//
-	if ((c=fgetc(felf)) < 0) return -1;
-	if (c != ELFMAG1) return -1;
-	elf_head -> e_ident [EI_MAG1] = c;
-	//
-	if ((c=fgetc(felf)) < 0) return -1;
-	if (c != ELFMAG2) return -1;
-	elf_head -> e_ident [EI_MAG2] = c;
-	//
-	if ((c=fgetc(felf)) < 0) return -1;
-	if (c != ELFMAG3) return -1;
-	elf_head -> e_ident [EI_MAG3] = c;
+	if (elf_head->e_ident[EI_MAG0] != ELFMAG0 || elf_head->e_ident[EI_MAG1] != ELFMAG1 ||
+        elf_head->e_ident[EI_MAG2] != ELFMAG2 || elf_head->e_ident[EI_MAG3] != ELFMAG3)
+            resultat = -1;
 	return resultat;
 }
 //lecture de l'entête elf pour initialiser la structure NULL en cas d'erreur
 Elf32_Ehdr *lecture_entete (FILE *felf) {
 	Elf32_Ehdr *elf_head = malloc (sizeof(Elf32_Ehdr));
-	int c;
 	if (elf_head == NULL) {
-		fprintf (stderr,"Erreur(1) Allocation de l'entete\n");
+		fprintf (stderr,"readelf : header : erreur\n");
 		return elf_head;
 	}
-/***********************************e_ident*********************************************/
-	//EI_MAG0...3
-	if (ElfId (felf,elf_head) < 0) {
-		fprintf (stderr,"readelf: ERREUR: N'est pas un fichier ELF – a les mauvais octets magiques au départ\n");
-		elf_head = NULL;
-		return elf_head;
-	}
-	//EI_CLASS
-	if ((c= fgetc (felf)) == EOF) {
-		fprintf (stderr,"readelf: Erreur: Fin du fichier atteinte\n");
-		elf_head = NULL;
-		return elf_head;
-	}
-	elf_head -> e_ident [EI_CLASS] = c;
-	//EI_DATA
-	if ((c= fgetc (felf)) == EOF) {
-		fprintf (stderr,"readelf: Erreur: Fin du fichier atteinte\n");
-		elf_head = NULL;
-		return elf_head;
-	}
-	elf_head -> e_ident [EI_DATA] = c;
-	//EI_VERSION
-	if ((c= fgetc (felf)) == EOF) {
-		fprintf (stderr,"readelf: Erreur: Fin du fichier atteinte\n");
-		elf_head = NULL;
-		return elf_head;
-	}
-	elf_head -> e_ident [EI_VERSION] = c;
-	//EI_PAD
-	if ((c= fgetc (felf)) == EOF) {
-		fprintf (stderr,"readelf: Erreur: Fin du fichier atteinte\n");
-		elf_head = NULL;
-		return elf_head;
-	}
-	elf_head -> e_ident [EI_PAD] = c;
-	//EI_NIDENT
-	if ((c= fgetc (felf)) == EOF) {
-		fprintf (stderr,"readelf: Erreur: Fin du fichier atteinte\n");
-		elf_head = NULL;
-		return elf_head;
-	}
-	elf_head -> e_ident [EI_NIDENT] = c;
-/************************************e_type*********************************/
-	if (fread (&(elf_head->e_type),2,1,felf) != 1) {
-		fprintf (stderr,"readelf: Erreur: e_type\n");
-		elf_head = NULL;
-		return elf_head;
-	}
-	elf_head ->e_type = value_16 (elf_head->e_type);
-/************************************e_machine******************************/
-	if (fread (&(elf_head->e_machine),2,1,felf) != 1) {
-		fprintf (stderr,"readelf : Erreur: e_machine\n");
-		elf_head = NULL;
-		return elf_head;
-	}
-	elf_head ->e_machine = value_16 (elf_head->e_machine);
-/************************************e_version******************************/
-	if (fread (&(elf_head->e_version),4,1,felf) != 1) {
-		fprintf (stderr,"readelf : Erreur: e_version\n");
-		elf_head = NULL;
-		return elf_head;
-	}
-	elf_head ->e_version = value_32 (elf_head->e_version);
-/************************************e_entry******************************/
-	if (fread (&(elf_head->e_entry),4,1,felf) != 1) {
-		fprintf (stderr,"readelf : Erreur: e_entry\n");
-		elf_head = NULL;
-		return elf_head;
-	}
-	elf_head ->e_entry = value_32 (elf_head->e_entry);
-/************************************e_phoff******************************/
-	if (fread (&(elf_head->e_phoff),4,1,felf) != 1) {
-		fprintf (stderr,"readelf : Erreur: e_phoff\n");
-		elf_head = NULL;
-		return elf_head;
-	}
-	elf_head ->e_phoff = value_32 (elf_head->e_phoff);
-/************************************e_shoff******************************/
-	if (fread (&(elf_head->e_shoff),4,1,felf) != 1) {
-		fprintf (stderr,"readelf : Erreur: e_shoff\n");
-		elf_head = NULL;
-		return elf_head;
-	}
-	elf_head ->e_shoff = value_32 (elf_head->e_shoff);
-/************************************e_flags******************************/
-	if (fread (&(elf_head->e_flags),4,1,felf) != 1) {
-		fprintf (stderr,"readelf : Erreur: e_flags\n");
-		elf_head = NULL;
-		return elf_head;
-	}
-	elf_head ->e_flags = value_32 (elf_head->e_flags);
-/************************************e_ehsize******************************/
-	if (fread (&(elf_head->e_ehsize),2,1,felf) != 1) {
-		fprintf (stderr,"readelf : Erreur: e_ehsize\n");
-		elf_head = NULL;
-		return elf_head;
-	}
-	elf_head ->e_ehsize = value_16 (elf_head->e_ehsize);
-/************************************e_phentsize******************************/
-	if (fread (&(elf_head->e_phentsize),2,1,felf) != 1) {
-		fprintf (stderr,"readelf : Erreur: e_phentsize\n");
-		elf_head = NULL;
-		return elf_head;
-	}
-	elf_head ->e_phentsize = value_16 (elf_head->e_phentsize);
-/************************************e_phnum******************************/
-	if (fread (&(elf_head->e_phnum),2,1,felf) != 1) {
-		fprintf (stderr,"readelf : Erreur: e_phnum\n");
-		elf_head = NULL;
-		return elf_head;
-	}
-	elf_head ->e_phnum = value_16 (elf_head->e_phnum);
-/************************************e_shentsize******************************/
-	if (fread (&(elf_head->e_shentsize),2,1,felf) != 1) {
-		fprintf (stderr,"readelf : Erreur: e_shentsize\n");
-		elf_head = NULL;
-		return elf_head;
-	}
-	elf_head ->e_shentsize = value_16 (elf_head->e_shentsize);
-/************************************e_shnum******************************/
-	if (fread (&(elf_head->e_shnum),2,1,felf) != 1) {
-		fprintf (stderr,"readelf : Erreur: e_shnum\n");
-		elf_head = NULL;
-		return elf_head;
-	}
-	elf_head ->e_shnum = value_16 (elf_head->e_shnum);
-/************************************e_shstrndx******************************/
-	if (fread (&(elf_head->e_shstrndx),2,1,felf) != 1) {
-		fprintf (stderr,"readelf : Erreur: e_shstrndx\n");
-		elf_head = NULL;
-		return elf_head;
-	}
-	elf_head ->e_shstrndx = value_16 (elf_head->e_shstrndx);
-
-	return elf_head;
+    rewind (felf);
+    /************e_ident*********/
+	fread (elf_head->e_ident,1,EI_NIDENT,felf);
+    if (ElfId (elf_head) < 0) {
+        fprintf (stderr,"readelf: ERREUR: N'est pas un fichier ELF – a les mauvais octets magiques au départ\n");
+        elf_head = NULL;
+        return elf_head;
+    }
+    /***********e_type***********/
+    fread (&(elf_head->e_type),sizeof(elf_head->e_type),1,felf);
+    /***********e_machine********/
+    fread (&(elf_head->e_machine),sizeof(elf_head->e_machine),1,felf);
+    /***********e_version********/
+    fread (&(elf_head->e_version),sizeof(elf_head->e_version),1,felf);
+    /***********e_entry**********/
+    fread (&(elf_head->e_entry),sizeof(elf_head->e_entry),1,felf);
+    /***********e_phoff**********/
+    fread (&(elf_head->e_phoff),sizeof(elf_head->e_phoff),1,felf);
+    /***********e_shoff**********/
+    fread (&(elf_head->e_shoff),sizeof(elf_head->e_shoff),1,felf);
+    /***********e_flags**********/
+    fread (&(elf_head->e_flags),sizeof(elf_head->e_flags),1,felf);
+    /***********e_ehsize*********/
+    fread (&(elf_head->e_ehsize),sizeof(elf_head->e_ehsize),1,felf);
+    /***********e_phentsize******/
+    fread (&(elf_head->e_phentsize),sizeof(elf_head->e_phentsize),1,felf);
+    /***********e_phnum**********/
+    fread (&(elf_head->e_phnum),sizeof(elf_head->e_phnum),1,felf);
+    /***********e_shentsize******/
+    fread (&(elf_head->e_shentsize),sizeof(elf_head->e_shentsize),1,felf);
+    /***********e_shnum**********/
+    fread (&(elf_head->e_shnum),sizeof(elf_head->e_shnum),1,felf);
+    /***********e_shstrndx*******/
+    fread (&(elf_head->e_shstrndx),sizeof(elf_head->e_shstrndx),1,felf);    
+    return elf_head;
 }
 
 //ajout ici
@@ -190,7 +76,7 @@ Elf32_Ehdr *lecture_entete (FILE *felf) {
 //afficheur Magique
 void print_e_ident(Elf32_Ehdr *entete)
 {
-    for(int i=0; i<EI_NIDENT; i++)
+    for(int i=0; i<16; i++)
         printf("%02x ", entete->e_ident[i]);
     printf("\n");
 }
@@ -276,6 +162,8 @@ void print_v_machine(Elf32_Ehdr *entete)
             break;
         case EM_MIPS_RS3_LE:   printf("MIPS RS4000 Big-Endidan");
             break;
+        case 62: printf ("Advanced Micro Devices X86-64");
+            break;
         default: printf("RESERVED");
             break;
     }
@@ -286,7 +174,7 @@ void print_v_machine(Elf32_Ehdr *entete)
 void print_OS(Elf32_Ehdr *entete)
 {
     if(entete->e_ident[EI_OSABI] == ELFOSABI_SYSV)
-        printf("Unix System V ABI");
+        printf(" UNIX - System V");
     if(entete->e_ident[EI_OSABI] == ELFOSABI_ARM)
         printf("Architecture ARM");
     if(entete->e_ident[EI_OSABI] == ELFOSABI_LINUX)
@@ -302,13 +190,12 @@ void print_e_version(Elf32_Ehdr *entete)
 {
     if(entete->e_version == EV_NONE)
 	{
-        printf("0\n");
+        printf("0x0\n");
 	}
     if(entete->e_version == EV_CURRENT)
 	{
-        printf("1\n");
+        printf("0x1\n");
 	}
-	printf(" \n");
 }
 
 //affichage de la version courant
@@ -317,9 +204,7 @@ void print_version (Elf32_Ehdr *entete) {
         printf ("%d (invalid)\n",entete -> e_ident [EI_VERSION]);
 	if (entete -> e_ident [EI_VERSION] == EV_CURRENT) 
         printf ("%d (current)\n",entete -> e_ident [EI_VERSION]);
-	printf("\n");
 }
-
 
 //affichage de l'entete
 void print_header(Elf32_Ehdr *entete)
@@ -334,8 +219,8 @@ void print_header(Elf32_Ehdr *entete)
     printf("Type: \t\t\t\t\t");         print_type(entete);
     printf("Machine: \t\t\t\t");      print_v_machine(entete);
     printf("Version: \t\t\t\t");      print_e_version(entete);
-    printf("Adresse du point d'entrée: \t\t %0x \n", entete->e_entry);
-    printf("Début des en-tetes de programmes: \t %d (octets dans le fichier)\n", entete->e_phoff);
+    printf("Adresse du point d'entrée:\t\t      0x%0x \n", entete->e_entry);
+    printf("Début des en-tetes de programme : \t %d (octets dans le fichier)\n", entete->e_phoff);
     printf("Début des en-tetes de section: \t\t %d (octets dans le fichier)\n", entete->e_shoff);
     printf("Fanions: \t\t\t\t %0x \n", entete->e_flags);
     printf("Taille de cet en-tete: \t\t\t %d (octets)\n", entete->e_ehsize);
@@ -346,7 +231,3 @@ void print_header(Elf32_Ehdr *entete)
     printf("Table d'index des chaines d'en-tete de section: \t %d\n", entete->e_shstrndx);
     printf("\n");
 }
-
-
-
-
