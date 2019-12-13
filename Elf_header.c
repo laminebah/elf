@@ -161,7 +161,6 @@ Elf32_Ehdr *lecture_entete (FILE *felf) {
 }
 
 //ajout ici
-#include "Elf_header.h"
 
 //afficheur Magique
 void print_e_ident(Elf32_Ehdr *entete)
@@ -256,17 +255,39 @@ void print_v_machine(Elf32_Ehdr *entete)
 }
 
 //print OS
+void print_OS(Elf32_Ehdr *entete)
+{
+    if(entete->e_ident[EI_OSABI] == ELFOSABI_SYSV)
+        printf("Unix System V ABI");
+    if(entete->e_ident[EI_OSABI] == ELFOSABI_ARM)
+        printf("Architecture ARM");
+    if(entete->e_ident[EI_OSABI] == ELFOSABI_LINUX)
+        printf("LINUX - System");
+    if(entete->e_ident[EI_OSABI] == ELFOSABI_TRU64)
+        printf("UNIX TRU64");
+    printf("\n");
+    
+}
 
 //affichage version
 void print_e_version(Elf32_Ehdr *entete)
 {
     if(entete->e_version == EV_NONE)
-        printf("NONE");
+        printf("0");
     else if(entete->e_version == EV_CURRENT)
-        printf("CURRENT");
+        printf("1");
     else 
         printf(" ");
 }
+
+//affichage de la version courant
+void aff_version (Elf32_Ehdr *entete) {
+	if (entete -> e_ident [EI_VERSION] == EV_NONE) 
+        printf ("%d (invalid)\n",entete -> e_ident [EI_VERSION]);
+	if (entete -> e_ident [EI_VERSION] == EV_CURRENT) 
+        printf ("%d (current)\n",entete -> e_ident [EI_VERSION]);
+}
+
 
 //affichage de l'entete
 void print_header(Elf32_Ehdr *entete)
@@ -276,21 +297,22 @@ void print_header(Elf32_Ehdr *entete)
     printf("Classe: ");         print_classe_type(entete);
     printf("Données: ");        print_codage_type(entete);
     printf("Version: ");        print_e_version(entete);
-    printf("OS/ABI: \n");
-    printf("Version ABI: \n");
+    printf("OS/ABI: \n");       print_OS(entete);
+    printf("Version ABI: %d \n", entete->e_ident[EI_ABIVERSION]);
     printf("Type: \n");         print_type(entete);
     printf("Machine: \n");      print_v_machine(entete);
-    printf("Version: \n");
-    printf("Adresse du point d'entrée: \n");
-    printf("Début des en-tetes de programmes: \n");
-    printf("Début des en-tetes de section: \n");
-    printf("Fanions: \n");
-    printf("Taille de cet en-tete: \n");
-    printf("Taille de l'entete du programme: \n");
-    printf("Nombre d'en-tete du programme: \n");
-    printf("Taille des en-tetes de section: \n");
-    printf("Nombre d'en-tete de section: \n");
-    printf("Table d'index des chaines d'en-tete de section: \n");
+    printf("Version: \n");      print_version(entete *entete);
+    printf("Adresse du point d'entrée: %0x \n", entete->e_entry);
+    printf("Début des en-tetes de programmes: %d (octets dans le fichier)\n", entete->e_phoff);
+    printf("Début des en-tetes de section: %d (octets dans le fichier)\n", entete->e_shoff);
+    printf("Fanions: %0x \n", entete->e_flags);
+    printf("Taille de cet en-tete: %d (octets)\n", entete->e_ehsize);
+    printf("Taille de l'entete du programme: %d (octets) \n", entete->e_phentsize);
+    printf("Nombre d'en-tete du programme: %d \n", entete->e_phnum);
+    printf("Taille des en-tetes de section: %d (octets) \n", entete->e_shentsize);
+    printf("Nombre d'en-tete de section: %d\n", entete->e_shnum);
+    printf("Table d'index des chaines d'en-tete de section: %d\n", entete->e_shstrndx);
+    printf("\n");
 }
 
 
