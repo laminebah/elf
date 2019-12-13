@@ -159,3 +159,140 @@ Elf32_Ehdr *lecture_entete (FILE *felf) {
 
 	return elf_head;
 }
+
+//ajout ici
+#include "Elf_header.h"
+
+//afficheur Magique
+void print_e_ident(Elf32_Ehdr *entete)
+{
+    for(int i=0; i<EI_NIDENT; i++)
+        printf("%02x ", entete->e_ident[i]);
+    printf("\n");
+}
+
+//affichage du type
+void print_type(Elf32_Ehdr *entete)
+{
+    switch (entete->e_type)
+    {
+        case ET_NONE:   printf("NONE");
+            break;
+        case ET_REL:    printf("REL");
+            break;
+        case ET_EXEC:   printf("EXEC");
+            break;
+        case ET_DYN:    printf("DYN");
+            break;
+        case ET_CORE:   printf("CORE");
+            break;
+        case ET_LOPROC: printf("LOPROC");
+            break;
+        case ET_HIPROC: printf("HIPROC");
+            break;
+        default:        printf(" ");
+            break;
+    }
+    printf("\n");
+}
+
+//affichage du type de classe
+void print_classe_type(Elf32_Ehdr *entete)
+{
+    switch (entete->e_ident[EI_CLASS])
+    {
+        case ELFCLASSNONE:  printf("Invalid Type Encoding\n");
+            break;
+        case ELFCLASS32: printf("ELF32");
+            break;
+        case ELFCLASS64: printf("ELF64");
+        default: 
+            break;
+        }
+}
+
+//affichage du type de codage
+void print_codage_type(Elf32_Ehdr *entete)
+{
+    switch(entete->e_ident[EI_DATA])
+    {
+        case ELFDATANONE: printf("Invalid data encoding");
+            break;
+        case ELFDATA2LSB: printf("Complement à 2, systeme à octets de poids fort d'abord (big endian)");
+            break;
+        case ELFDATA2MSB: printf("Complement à 2, systeme à octets de poids faible d'abord (little endian)");
+            break;
+        default:
+            break;
+    }
+}
+
+//affichhage architecture machine
+void print_v_machine(Elf32_Ehdr *entete)
+{
+    switch(entete->e_machine)
+    {
+        case ET_NONE:   printf("No Machine");
+            break;
+        case EM_M32:   printf("AT&T WE 32100");
+            break;
+        case EM_SPARC:   printf("SPARC");
+            break;
+        case EM_386:   printf("Intel Architecture");
+            break;
+        case EM_68K:   printf("Motorola 68000");
+            break;
+        case EM_88K:   printf("Motorola 88000");
+            break;
+        case EM_860:   printf("Intel 80860");
+            break;
+        case EM_MIPS:   printf("MIPS RS3000 Big-Endian");
+            break;
+        case EM_MIPS_RS3_LE:   printf("MIPS RS4000 Big-Endidan");
+            break;
+        default: printf("RESERVED");
+            break;
+    }
+}
+
+//print OS
+
+//affichage version
+void print_e_version(Elf32_Ehdr *entete)
+{
+    if(entete->e_version == EV_NONE)
+        printf("NONE");
+    else if(entete->e_version == EV_CURRENT)
+        printf("CURRENT");
+    else 
+        printf(" ");
+}
+
+//affichage de l'entete
+void print_header(Elf32_Ehdr *entete)
+{
+    printf("En-tête ELF: \n");
+    printf("Magique: ");        print_e_ident(entete);
+    printf("Classe: ");         print_classe_type(entete);
+    printf("Données: ");        print_codage_type(entete);
+    printf("Version: ");        print_e_version(entete);
+    printf("OS/ABI: \n");
+    printf("Version ABI: \n");
+    printf("Type: \n");         print_type(entete);
+    printf("Machine: \n");      print_v_machine(entete);
+    printf("Version: \n");
+    printf("Adresse du point d'entrée: \n");
+    printf("Début des en-tetes de programmes: \n");
+    printf("Début des en-tetes de section: \n");
+    printf("Fanions: \n");
+    printf("Taille de cet en-tete: \n");
+    printf("Taille de l'entete du programme: \n");
+    printf("Nombre d'en-tete du programme: \n");
+    printf("Taille des en-tetes de section: \n");
+    printf("Nombre d'en-tete de section: \n");
+    printf("Table d'index des chaines d'en-tete de section: \n");
+}
+
+
+
+
