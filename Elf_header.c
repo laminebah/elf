@@ -4,11 +4,18 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-
-//convert little endian
-int32_t value32(Elf32_Ehdr h, int32_t value)
+int32_t value_32(int32_t value)
 {
-	
+	if(is_big_endian())
+		return __bswap_32(value);
+	return value;
+}
+
+int16_t value_16(int16_t value)
+{
+	if(is_big_endian())
+		return __bswap_16(value);
+	return value;
 }
 
 // -1 en cas d'erreur si les nombres magiques sont bons
@@ -89,80 +96,91 @@ Elf32_Ehdr *lecture_entete (FILE *felf) {
 		elf_head = NULL;
 		return elf_head;
 	}
+	elf_head ->e_type = value_16 (elf_head->e_type);
 /************************************e_machine******************************/
 	if (fread (&(elf_head->e_machine),2,1,felf) != 1) {
 		fprintf (stderr,"readelf : Erreur: e_machine\n");
 		elf_head = NULL;
 		return elf_head;
 	}
+	elf_head ->e_machine = value_16 (elf_head->e_machine);
 /************************************e_version******************************/
 	if (fread (&(elf_head->e_version),4,1,felf) != 1) {
 		fprintf (stderr,"readelf : Erreur: e_version\n");
 		elf_head = NULL;
 		return elf_head;
 	}
+	elf_head ->e_version = value_32 (elf_head->e_version);
 /************************************e_entry******************************/
 	if (fread (&(elf_head->e_entry),4,1,felf) != 1) {
 		fprintf (stderr,"readelf : Erreur: e_entry\n");
 		elf_head = NULL;
 		return elf_head;
 	}
+	elf_head ->e_entry = value_32 (elf_head->e_entry);
 /************************************e_phoff******************************/
 	if (fread (&(elf_head->e_phoff),4,1,felf) != 1) {
 		fprintf (stderr,"readelf : Erreur: e_phoff\n");
 		elf_head = NULL;
 		return elf_head;
 	}
+	elf_head ->e_phoff = value_32 (elf_head->e_phoff);
 /************************************e_shoff******************************/
 	if (fread (&(elf_head->e_shoff),4,1,felf) != 1) {
 		fprintf (stderr,"readelf : Erreur: e_shoff\n");
 		elf_head = NULL;
 		return elf_head;
 	}
+	elf_head ->e_shoff = value_32 (elf_head->e_shoff);
 /************************************e_flags******************************/
 	if (fread (&(elf_head->e_flags),4,1,felf) != 1) {
 		fprintf (stderr,"readelf : Erreur: e_flags\n");
 		elf_head = NULL;
 		return elf_head;
 	}
+	elf_head ->e_flags = value_32 (elf_head->e_flags);
 /************************************e_ehsize******************************/
 	if (fread (&(elf_head->e_ehsize),2,1,felf) != 1) {
 		fprintf (stderr,"readelf : Erreur: e_ehsize\n");
 		elf_head = NULL;
 		return elf_head;
 	}
-
+	elf_head ->e_ehsize = value_16 (elf_head->e_ehsize);
 /************************************e_phentsize******************************/
 	if (fread (&(elf_head->e_phentsize),2,1,felf) != 1) {
 		fprintf (stderr,"readelf : Erreur: e_phentsize\n");
 		elf_head = NULL;
 		return elf_head;
 	}
-
+	elf_head ->e_phentsize = value_16 (elf_head->e_phentsize);
 /************************************e_phnum******************************/
 	if (fread (&(elf_head->e_phnum),2,1,felf) != 1) {
 		fprintf (stderr,"readelf : Erreur: e_phnum\n");
 		elf_head = NULL;
 		return elf_head;
 	}
+	elf_head ->e_phnum = value_16 (elf_head->e_phnum);
 /************************************e_shentsize******************************/
 	if (fread (&(elf_head->e_shentsize),2,1,felf) != 1) {
 		fprintf (stderr,"readelf : Erreur: e_shentsize\n");
 		elf_head = NULL;
 		return elf_head;
 	}
+	elf_head ->e_shentsize = value_16 (elf_head->e_shentsize);
 /************************************e_shnum******************************/
 	if (fread (&(elf_head->e_shnum),2,1,felf) != 1) {
 		fprintf (stderr,"readelf : Erreur: e_shnum\n");
 		elf_head = NULL;
 		return elf_head;
 	}
+	elf_head ->e_shnum = value_16 (elf_head->e_shnum);
 /************************************e_shstrndx******************************/
 	if (fread (&(elf_head->e_shstrndx),2,1,felf) != 1) {
 		fprintf (stderr,"readelf : Erreur: e_shstrndx\n");
 		elf_head = NULL;
 		return elf_head;
 	}
+	elf_head ->e_shstrndx = value_16 (elf_head->e_shstrndx);
 
 	return elf_head;
 }
