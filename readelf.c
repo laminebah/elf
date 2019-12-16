@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <string.h>
 #include "section_header.h"
+#include "print_content_section.h"
 #define A  0 //toutes les commandes
 #define H  1 //entete
 #define X  2 //une section avec numéro ou name
@@ -70,12 +71,15 @@ int main (int argc,char **argv) {
 		fprintf(stderr, "Erreur d'ouverture du fichier \n");
 		return EXIT_FAILURE;		
 	}
-	int numero;
+
 	char *namesection;
+
 	//déclaration des tructures
 	Elf32_Ehdr * elf_head;
 	Elf32_Shdr *sectionHeader;
-	
+
+		
+
 	elf_head = lecture_entete (felf);
 	if (elf_head == NULL)
 	{
@@ -105,8 +109,17 @@ int main (int argc,char **argv) {
 			//symbole : A compléter
 			break;
 		case X:
-			//content_section : A compléter
+			//contenu_section : A compléter
+								//une section : soit par N° section ou Name sections
+								//si c'est entier on affiche à l'aide du numéro sinon à l'aide du nom
+			
+			namesection=malloc(sizeof(char)*strlen(argv[2])+1);
+			if (namesection == NULL) return EXIT_FAILURE;
+			strcpy(namesection,"");
+			strcat(namesection,argv[2]);
+			print_content_section(namesection, sectionHeader, elf_head, felf);
 			break;
+
 		case R:
 			//relocation
 		/*******A compléter*******/
@@ -118,4 +131,3 @@ int main (int argc,char **argv) {
 	fclose (felf);
 	return EXIT_SUCCESS;
 }
-
