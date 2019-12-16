@@ -1,11 +1,10 @@
 #include "Elf_header.h"
-#include "section_header.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "printhead.h"
 #include <unistd.h>
 #include <string.h>
-
+#include "section_header.h"
 #define A  0 //toutes les commandes
 #define H  1 //entete
 #define X  2 //une section avec numéro ou name
@@ -18,7 +17,7 @@ void freemem (void *adr) {
 }
 
 int main (int argc,char **argv) { 
-	int option,choix=0;
+	int option=0,choix=0;
 	while ((option=getopt(argc,argv,"ahxsrS:")) != -1) {
 		switch (option) {
 			case 'a':
@@ -76,48 +75,37 @@ int main (int argc,char **argv) {
 	//déclaration des tructures
 	Elf32_Ehdr * elf_head;
 	Elf32_Shdr *sectionHeader;
+	
 	elf_head = lecture_entete (felf);
 	if (elf_head == NULL)
 	{
 		fprintf(stderr, "Erreur d'initialisation de l'entete \n");
 		exit(1);
 	}
+	
+	sectionHeader=malloc(elf_head->e_shnum*sizeof(Elf32_Shdr));
+	get_sh_values(&sectionHeader,felf,elf_head);
+
 	//exécution commande option
 	switch (choix) {
 		case A:
 			//all : A compléter
+			print_header(elf_head);
+			print_section(felf,sectionHeader,elf_head);
 			break;
 		case XS:
 			//table section : A compléter
-			
-			sectionHeader=malloc(elf_head->e_shnum*sizeof(Elf32_Shdr));
-			get_sh_values(&sectionHeader,felf,elf_head);
 			print_section(felf,sectionHeader,elf_head);
-			free(sectionHeader);
 			break;
 		case H:
 			//entete :
-			
+			print_header(elf_head);
 			break;
 		case S:
 			//symbole : A compléter
 			break;
 		case X:
-			//une section : soit par N° section ou Name sections
-			//si c'est entier on affiche à l'aide du numéro sinon à l'aide du nom
-			if ((numero=atoi(argv[2]))) {
-				//appel de la fonction en lui fournissant N°
-				//*****A compléter******/
-			} else {
-				//par name;
-				namesection=malloc(sizeof(char)*strlen(argv[2])+1);
-				if (namesection == NULL) return EXIT_FAILURE;
-				if (argv[2][0] != '.') strcpy(namesection,".");
-				else strcpy(namesection,"");
-				strcat(namesection,argv[2]);
-				//appel de la fonction en lui fournissant name
-				//******A compléter*******/
-			}
+			//content_section : A compléter
 			break;
 		case R:
 			//relocation
@@ -126,6 +114,8 @@ int main (int argc,char **argv) {
 
 	}
 	freemem (elf_head);
+	freemem (sectionHeader);
 	fclose (felf);
 	return EXIT_SUCCESS;
 }
+
