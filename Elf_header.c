@@ -5,20 +5,6 @@
 #include <stdlib.h>
 #include "util.h"
 
-int32_t value_32(int32_t value)
-{
-	if(is_big_endian())
-		return __bswap_32(value);
-	return value;
-}
-
-int16_t value_16(int16_t value)
-{
-	if(is_big_endian())
-		return __bswap_16(value);
-	return value;
-}
-
 // -1 en cas d'erreur si les nombres magiques sont bons
 int ElfId (Elf32_Ehdr * elf_head) {
 	int resultat  = 0;
@@ -49,7 +35,7 @@ Elf32_Ehdr *lecture_entete (FILE *felf) {
     /***********e_version********/
     fread (&(elf_head->e_version),sizeof(elf_head->e_version),1,felf);
     /***********e_entry**********/
-    fread (&(elf_head->e_entry),sizeof(elf_head->e_entry),1,felf);
+    fread (&(elf_head->e_entry),if(is_big_endian())sizeof(elf_head->e_entry),1,felf);
     /***********e_phoff**********/
     fread (&(elf_head->e_phoff),sizeof(elf_head->e_phoff),1,felf);
     /***********e_shoff**********/
