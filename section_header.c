@@ -167,13 +167,13 @@ void print_section (FILE *file, Elf32_Shdr *T, Elf32_Ehdr *e){
 	free(name);
 }
 
-void elf_print_header(Elf32_Shdr **sectionHeader, FILE* f,Elf32_Ehdr *h){
+void get_sh_values(Elf32_Shdr **sectionHeader, FILE* f,Elf32_Ehdr *h){
 	fseek(f,h->e_shoff,SEEK_SET);
 	int i;
     for(i=0;i<h->e_shnum;i++)
     	read_section(f,&((*sectionHeader)[i]),*h);
 }
-
+/*
 int main(int argc, char *argv[]){
 
 
@@ -181,9 +181,9 @@ int main(int argc, char *argv[]){
 	Elf32_Ehdr *h;
 	Elf32_Shdr *sectionHeader;
 	f=fopen(argv[1],"r");
-    	h=lecture_entete(f);
+    h=lecture_entete(f);
 	sectionHeader=malloc(h->e_shnum*sizeof(Elf32_Shdr));
-    	elf_print_header(&sectionHeader,f,h);
+    get_sh_values(&sectionHeader,f,h);
 	print_section(f,sectionHeader,h);
 	free(sectionHeader);
 	fclose(f);
@@ -195,7 +195,7 @@ int main(int argc, char *argv[]){
 
 
 
-
+*/
 
 
 

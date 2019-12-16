@@ -6,7 +6,8 @@
 
 void print_e_ident(Elf32_Ehdr *entete)
 {
-    for(int i=0; i<16; i++)
+    int i;
+    for(i=0; i<16; i++)
         printf("%02x ", entete->e_ident[i]);
     printf("\n");
 }
@@ -139,7 +140,8 @@ void print_version (Elf32_Ehdr *entete) {
 }
 
 void print_space (int n) {
-    for (int i = 0; i < n; i ++)
+    int i;
+    for (i = 0; i < n; i ++)
         printf (" ");
 }
 //affichage de l'entete
@@ -156,7 +158,7 @@ void print_header(Elf32_Ehdr *entete)
     printf("  Machine:"); print_space(27); print_v_machine(entete);
     printf("  Version:"); print_space(27); print_e_version(entete);
     printf("  Adresse du point d'entrée:"); print_space(15); printf("0x%0x\n", entete->e_entry);
-    printf("  Début des en-têtes de programme :");print_space(10);printf("%d (octets dans le fichier)\n", entete->e_phoff);
+    printf("  Début des en-têtes de programme :");print_space(10);printf("%d (octets dans le fichier)\n", entete->e_phoff);
     printf("  Début des en-têtes de section :");print_space(10);printf("%d (octets dans le fichier)\n", entete->e_shoff);
     printf("  Fanions:");print_space(27);printf("0x%0x\n", entete->e_flags);
     printf("  Taille de cet en-tête:");print_space(13);printf("%d (octets)\n", entete->e_ehsize);

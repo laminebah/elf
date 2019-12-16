@@ -1,9 +1,11 @@
 #include "Elf_header.h"
+#include "section_header.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "printhead.h"
 #include <unistd.h>
 #include <string.h>
+
 #define A  0 //toutes les commandes
 #define H  1 //entete
 #define X  2 //une section avec numéro ou name
@@ -16,7 +18,7 @@ void freemem (void *adr) {
 }
 
 int main (int argc,char **argv) { 
-	int option,choix;
+	int option,choix=0;
 	while ((option=getopt(argc,argv,"ahxsrS:")) != -1) {
 		switch (option) {
 			case 'a':
@@ -73,6 +75,7 @@ int main (int argc,char **argv) {
 	char *namesection;
 	//déclaration des tructures
 	Elf32_Ehdr * elf_head;
+	Elf32_Shdr *sectionHeader;
 	elf_head = lecture_entete (felf);
 	if (elf_head == NULL)
 	{
@@ -86,10 +89,15 @@ int main (int argc,char **argv) {
 			break;
 		case XS:
 			//table section : A compléter
+			
+			sectionHeader=malloc(elf_head->e_shnum*sizeof(Elf32_Shdr));
+			get_sh_values(&sectionHeader,felf,elf_head);
+			print_section(felf,sectionHeader,elf_head);
+			free(sectionHeader);
 			break;
 		case H:
 			//entete :
-			print_header(elf_head);
+			
 			break;
 		case S:
 			//symbole : A compléter
@@ -121,4 +129,3 @@ int main (int argc,char **argv) {
 	fclose (felf);
 	return EXIT_SUCCESS;
 }
-

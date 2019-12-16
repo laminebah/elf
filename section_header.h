@@ -22,7 +22,6 @@ void print_section (FILE *file, Elf32_Shdr *T, Elf32_Ehdr *e);
 
 void get_sh_values(Elf32_Shdr **sectionHeader, FILE* f,Elf32_Ehdr *h);
 
-int main(int argc, char *argv[]);
 
 
 
