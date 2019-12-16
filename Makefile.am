@@ -12,7 +12,7 @@ AM_CFLAGS+=-D BIG_ENDIAN_SIMULATOR
 LDADD=-lpthread
 
 
-SUBDIRS=
+SUBDIRS= 
 SUBDIRS+=. Examples_loader
 
 bin_PROGRAMS=
@@ -20,12 +20,12 @@ bin_PROGRAMS+=ARM_runner_example readelf
 
 
 COMMON=debug.h debug.c util.h util.c
-section_header=Elf_header.h Elf_header.c section_header.h section_header.c readelf.c printhead.c printhead.h
+readelf=Myreadelf/Elf_header.h Myreadelf/Elf_header.c Myreadelf/printhead.h Myreadelf/printhead.c Myreadelf/section_header.h Myreadelf/section_header.c  Myreadelf/print_content_section.h Myreadelf/print_content_section.c
+
 EXTRA_DIST=filtre.pl
 SIMULATOR_INTERFACE=csapp.h csapp.c scanner.h scanner.l gdb_protocol.h gdb_protocol.c arm_simulator_interface.h arm_simulator_interface.c
-
 ARM_runner_example_SOURCES=$(COMMON) $(SIMULATOR_INTERFACE) ARM_runner_example.c
-readelf_SOURCES=$(COMMON) $(SIMULATOR_INTERFACE) $(section_header) 
+readelf_SOURCES= $(COMMON) $(readelf) Myreadelf/readelf.c
 
 EXTRA_DIST+=sample_run.sh
 
