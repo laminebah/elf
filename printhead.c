@@ -13,32 +13,59 @@ void print_e_ident(Elf32_Ehdr *entete)
 
 void print_type(Elf32_Ehdr *entete)
 {
-    stringTypes type [] = { {ET_NONE, "Aucun"},                    {ET_REL , "REL (fichier de réadressage)"},
-                            {ET_EXEC, "EXEC (fichier exécutable)"},{ET_DYN,  "DYN (fichier objet partagé)"},
-                            {ET_CORE, "CORE (fichier Core)"},      {ET_LOPROC  ,"LOPROC"},
-                            {ET_HIPROC,"HIPROC"},                  {0xFFFFFFFF,"Inconnue"}
-    };
-    printf ("%s\n",type[entete->e_type].chaine);
+      switch (entete->e_type) {
+		case ET_NONE:
+			printf ("Aucun");
+		 break;
+		 case ET_REL:
+			printf ("REL (fichier de réadressage)");
+		 break;
+		 case ET_EXEC:
+			printf ("EXEC (fichier exécutable)");
+		 break;
+		 case ET_DYN:
+			printf ("DYN (fichier objet partagé)");
+		 break;
+		 case ET_CORE:
+			printf ("CORE (fichier Core)");
+		 break;
+		 case ET_LOPROC:
+			printf ("LOPROC");
+		 break;
+		 case ET_HIPROC:
+			printf ("HIPROC");
+		 break;
+		 default:printf("Inconnue");
+	}
+	printf ("\n");
 }
 
 //affichage du type de classe
 void print_classe_type(Elf32_Ehdr *entete)
 {   
-   stringTypes class [] = { {ELFCLASSNONE,"Aucune"},{ELFCLASS32,  "ELF32"},
-                            {ELFCLASS64,  "ELF64"}, {0xFFFFFFFF,"Inconnue"}
-   };
-   printf ("%s\n",class[entete->e_ident[EI_CLASS]].chaine);
+	switch (entete->e_ident[EI_CLASS]) {
+		case ELFCLASSNONE: printf("Aucune");
+			break;
+		case ELFCLASS32: printf("ELF32");
+			break;
+		case ELFCLASS64:  printf("ELF64");
+			break;
+	}
+	printf("\n");
 }
 
 //affichage du type de codage
 void print_codage_type(Elf32_Ehdr *entete)
 {
-    stringTypes data [] = { {ELFDATANONE,"Aucune"},
-                            {ELFDATA2LSB,"complément à 2, système à octets de poids faible d'abord (little endian)"},
-                            {ELFDATA2MSB,"complément à 2, système à octets de poids faible après (big endian)"},
-                            {0xFFFFFFFF,"Inconnue"}
-    };
-	printf("%s\n",data[entete->e_ident[EI_DATA]].chaine);
+	switch (entete->e_ident[EI_DATA]) {
+		case ELFDATANONE: printf("Aucune");
+			break;
+		case ELFDATA2LSB: printf("complément à 2, système à octets de poids faible d'abord (little endian)");
+			break;
+		case ELFDATA2MSB: printf ("complément à 2, système à octets de poids faible après (big endian)");
+			break;
+	}
+	printf("\n");
 }
 
 //affichhage architecture machine
@@ -91,18 +118,24 @@ void print_OS(Elf32_Ehdr *entete)
 //affichage version
 void print_e_version(Elf32_Ehdr *entete)
 {
-     stringTypes eversion [] = {{EV_NONE,"0x0"},{EV_CURRENT,"0x1"}
-
-    };
-    printf ("%s\n",eversion[entete->e_version].chaine);
+	switch (entete->e_version) {
+		case EV_NONE:     printf("0x0");
+			break;
+		case EV_CURRENT : printf("0x1");
+			break;
+	}
+	printf("\n");
 }
 
 //affichage de la version courant
 void print_version (Elf32_Ehdr *entete) {
-	 stringTypes version [] = {{EV_NONE,"(invadlid)"},{EV_CURRENT,"(current)"}
-
-     };
-    printf ("%d %s\n",entete->e_ident[EI_VERSION],version[entete->e_ident[EI_VERSION]].chaine);
+	switch (entete->e_ident[EI_VERSION]) {
+	case EV_NONE: printf ("(invadlid)");
+		break;
+	case EV_CURRENT: printf("(current)");
+		break;
+	}
+	printf("\n");
 }
 
 void print_space (int n) {
