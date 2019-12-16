@@ -42,7 +42,7 @@ Elf32_Ehdr *lecture_entete (FILE *felf) {
         elf_head = NULL;
         return elf_head;
     }
-    /***********e_type***********/
+     /***********e_type***********/
     fread (&(elf_head->e_type),sizeof(elf_head->e_type),1,felf);
     /***********e_machine********/
     fread (&(elf_head->e_machine),sizeof(elf_head->e_machine),1,felf);
@@ -68,6 +68,23 @@ Elf32_Ehdr *lecture_entete (FILE *felf) {
     fread (&(elf_head->e_shnum),sizeof(elf_head->e_shnum),1,felf);
     /***********e_shstrndx*******/
     fread (&(elf_head->e_shstrndx),sizeof(elf_head->e_shstrndx),1,felf);    
+    if (elf_head->e_ident[EI_DATA] == ELFDATA2MSB) {
+		elf_head -> e_type    = __bswap_16 (elf_head -> e_type);
+		elf_head -> e_machine = __bswap_16 (elf_head -> e_machine);
+		elf_head -> e_version = __bswap_32 (elf_head -> e_version);
+		elf_head -> e_entry   = __bswap_32 (elf_head -> e_entry);
+		elf_head -> e_phoff   = __bswap_32 (elf_head -> e_phoff);
+		elf_head -> e_shoff   = __bswap_32 (elf_head -> e_shoff);
+		elf_head -> e_flags   = __bswap_32 (elf_head -> e_flags);
+		
+		elf_head -> e_ehsize    = __bswap_16 (elf_head -> e_ehsize);
+		elf_head -> e_phentsize = __bswap_16 (elf_head -> e_phentsize);
+		elf_head -> e_phnum     = __bswap_16 (elf_head -> e_phnum);
+		elf_head -> e_shentsize = __bswap_16 (elf_head -> e_shentsize);
+		elf_head -> e_shnum     = __bswap_16 (elf_head   -> e_shnum);
+		elf_head -> e_shstrndx  = __bswap_16 (elf_head -> e_shstrndx);
+		
+	}
     return elf_head;
 }
 
