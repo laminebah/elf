@@ -35,7 +35,7 @@ Elf32_Ehdr *lecture_entete (FILE *felf) {
     /***********e_version********/
     fread (&(elf_head->e_version),sizeof(elf_head->e_version),1,felf);
     /***********e_entry**********/
-    fread (&(elf_head->e_entry),if(is_big_endian())sizeof(elf_head->e_entry),1,felf);
+    fread (&(elf_head->e_entry),sizeof(elf_head->e_entry),1,felf);
     /***********e_phoff**********/
     fread (&(elf_head->e_phoff),sizeof(elf_head->e_phoff),1,felf);
     /***********e_shoff**********/
