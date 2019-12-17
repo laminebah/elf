@@ -6,6 +6,8 @@
 #include <string.h>
 #include "section_header.h"
 #include "print_content_section.h"
+#include "Elf_symbole.h"
+#include "print_symbole.h"
 #define A  0 //toutes les commandes
 #define H  1 //entete
 #define X  2 //une section avec numéro ou name
@@ -47,6 +49,7 @@ int main (int argc,char **argv) {
 				break;
 			default:
 				return EXIT_FAILURE;
+				
 		}
 	}
 	FILE *felf;
@@ -77,8 +80,8 @@ int main (int argc,char **argv) {
 	//déclaration des tructures
 	Elf32_Ehdr * elf_head;
 	Elf32_Shdr *sectionHeader;
-
-		
+	Elf32_Sym *symbtab;
+	int nbsymb=0,index = 0;	
 
 	elf_head = lecture_entete (felf);
 	if (elf_head == NULL)
@@ -89,7 +92,7 @@ int main (int argc,char **argv) {
 	
 	sectionHeader=malloc(elf_head->e_shnum*sizeof(Elf32_Shdr));
 	get_sh_values(&sectionHeader,felf,elf_head);
-
+	symbtab = lecture_symb(felf,sectionHeader,*elf_head,&nbsymb,&index);
 	//exécution commande option
 	switch (choix) {
 		case A:
@@ -107,6 +110,7 @@ int main (int argc,char **argv) {
 			break;
 		case S:
 			//symbole : A compléter
+			affiche_symbole_table (symbtab,nbsymb,index,sectionHeader,felf);
 			break;
 		case X:
 			//contenu_section : A compléter
