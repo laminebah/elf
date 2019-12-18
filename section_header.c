@@ -22,7 +22,8 @@ int16_t val_16(Elf32_Ehdr h, int16_t value){
 
 
 void read_section(FILE *fichier, Elf32_Shdr *s, Elf32_Ehdr h){
-	fread(s,1,sizeof(Elf32_Shdr),fichier);
+	size_t f __attribute__((unused)) = fread(s,1,sizeof(Elf32_Shdr),fichier);
+	
 	s->sh_name        = val_32(h, s->sh_name);
 	s->sh_type        = val_32(h, s->sh_type);
 	s->sh_flags       = val_32(h, s->sh_flags);
@@ -124,6 +125,7 @@ char *read_flags (char * flags, Elf32_Word flag){
 }
 
 
+
 void print_section (FILE *file, Elf32_Shdr *T, Elf32_Ehdr *e){
 	
 	Elf32_Shdr S;
@@ -147,7 +149,7 @@ void print_section (FILE *file, Elf32_Shdr *T, Elf32_Ehdr *e){
 
 		// Récupération du nom
 		fseek(file, T[e->e_shstrndx].sh_offset+S.sh_name, SEEK_SET);
-		fgets(name, SIZENAME, file);
+		char *g __attribute__((unused)) = fgets(name, SIZENAME, file);
 
 		// Affichage de tous les éléments de la section
 		printf("%-17.17s\t", name);
@@ -170,34 +172,12 @@ void print_section (FILE *file, Elf32_Shdr *T, Elf32_Ehdr *e){
 	free(name);
 }
 
-void elf_print_header(Elf32_Shdr **sectionHeader, FILE* f,Elf32_Ehdr *h){
+void get_sh_values(Elf32_Shdr **sectionHeader, FILE* f,Elf32_Ehdr *h){
 	fseek(f,h->e_shoff,SEEK_SET);
 	int i;
     for(i=0;i<h->e_shnum;i++)
     	read_section(f,&((*sectionHeader)[i]),*h);
 }
-
-int main(int argc, char *argv[]){
-
-
-	FILE *f;
-	Elf32_Ehdr *h;
-	Elf32_Shdr *sectionHeader;
-	f=fopen(argv[1],"r");
-    	h=lecture_entete(f);
-	sectionHeader=malloc(h->e_shnum*sizeof(Elf32_Shdr));
-    	elf_print_header(&sectionHeader,f,h);
-	print_section(f,sectionHeader,h);
-	free(sectionHeader);
-	fclose(f);
-	
-	
-	return 0;
-}
-
-
-
-
 
 
 
