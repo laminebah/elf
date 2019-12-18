@@ -6,8 +6,8 @@
 
 void print_e_ident(Elf32_Ehdr *entete)
 {
-    int i;
-    for(i=0; i<16; i++)
+    int i = 0;
+    for(; i<16; i++)
         printf("%02x ", entete->e_ident[i]);
     printf("\n");
 }
@@ -19,7 +19,7 @@ void print_type(Elf32_Ehdr *entete)
 			printf ("Aucun");
 		 break;
 		 case ET_REL:
-			printf ("REL (fichier de réadressage)");
+			printf ("REL (Fichier de réadressage)");
 		 break;
 		 case ET_EXEC:
 			printf ("EXEC (fichier exécutable)");
@@ -63,7 +63,7 @@ void print_codage_type(Elf32_Ehdr *entete)
 			break;
 		case ELFDATA2LSB: printf("complément à 2, système à octets de poids faible d'abord (little endian)");
 			break;
-		case ELFDATA2MSB: printf ("complément à 2, système à octets de poids faible après (big endian)");
+		case ELFDATA2MSB: printf ("complément à 2, système à octets de poids fort d'abord (big endian)");
 			break;
 	}
 	printf("\n");
@@ -131,18 +131,35 @@ void print_e_version(Elf32_Ehdr *entete)
 //affichage de la version courant
 void print_version (Elf32_Ehdr *entete) {
 	switch (entete->e_ident[EI_VERSION]) {
-	case EV_NONE: printf ("(invadlid)");
+	case EV_NONE: printf ("0 (invadlid)");
 		break;
-	case EV_CURRENT: printf("(current)");
+	case EV_CURRENT: printf("1 (current)");
 		break;
 	}
 	printf("\n");
 }
 
 void print_space (int n) {
-    int i;
-    for (i = 0; i < n; i ++)
+    int i = 0;
+    for (; i < n; i ++)
         printf (" ");
+}
+void print_flags (Elf32_Ehdr *entete) {
+	switch(entete->e_flags) {
+		case 0x05000000: printf ("Version5 EABI");
+			break;
+		case 0x00800000:	printf ("Version8 EABI");
+			break;
+		case 0x00400FFF: printf ("Version4 EABI and earlier");
+			break;
+		case 0x00000400: printf ("Version5 EABI and later");
+			break;
+		case 0x00000200: printf ("Version5 EABI and later");
+			break;
+		case 0x5000200: printf("Version5 EABI, soft-float ABI");
+			break;
+	}
+	printf ("\n");
 }
 //affichage de l'entete
 void print_header(Elf32_Ehdr *entete)
@@ -154,13 +171,13 @@ void print_header(Elf32_Ehdr *entete)
     printf("  Version:"); print_space(27); print_version(entete);
     printf("  OS/ABI:");  print_space(28); print_OS(entete);
     printf("  Version ABI:"); print_space(23); printf("%d\n", entete->e_ident[EI_ABIVERSION]);
-    printf("  Type:");    print_space(30); print_type(entete);
+    printf("  Type:");print_space(30); print_type(entete);
     printf("  Machine:"); print_space(27); print_v_machine(entete);
     printf("  Version:"); print_space(27); print_e_version(entete);
     printf("  Adresse du point d'entrée:"); print_space(15); printf("0x%0x\n", entete->e_entry);
-    printf("  Début des en-têtes de programme :");print_space(10);printf("%d (octets dans le fichier)\n", entete->e_phoff);
+    printf("  Début des en-têtes de programme :");print_space(10);printf("%d (octets dans le fichier)\n", entete->e_phoff);
     printf("  Début des en-têtes de section :");print_space(10);printf("%d (octets dans le fichier)\n", entete->e_shoff);
-    printf("  Fanions:");print_space(27);printf("0x%0x\n", entete->e_flags);
+    printf("  Fanions:");print_space(27);printf("0x%0x, ", entete->e_flags);print_flags (entete);
     printf("  Taille de cet en-tête:");print_space(13);printf("%d (octets)\n", entete->e_ehsize);
     printf("  Taille de l'en-tête du programme:");print_space(2);printf("%d (octets)\n", entete->e_phentsize);
     printf("  Nombre d'en-tête du programme:");print_space(5);printf("%d\n", entete->e_phnum);
