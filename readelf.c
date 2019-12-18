@@ -60,7 +60,7 @@ int main (int argc,char **argv) {
 			exit(1);
 		}
 		//printf ("%s\n",argv[3]);
-		felf = fopen (argv[3],"rb");
+		felf = fopen (argv[3],"r");
 	} else {
 		if(argc < 3) {
 			fprintf(stderr, "Nombre d'argument incorrect \n");
@@ -68,13 +68,13 @@ int main (int argc,char **argv) {
 			exit(1);
 		}
 		//sprintf ("%s\n",argv[2]);
-		felf = fopen (argv[2],"rb");
+		felf = fopen (argv[2],"r");
 	}
 	if (felf == NULL) {
-		fprintf(stderr, "Erreur d'ouverture du fichier \n");
-		return EXIT_FAILURE;		
-	}
-
+		if (choix == X) printf("readelf::- ERREUR: « %s » n'est pas un fichier ordinaire\n",argv[3]);
+		else printf("readelf::- ERREUR:  « %s » n'est pas un fichier ordinaire\n",argv[2]);
+		exit(1);		
+	}	
 	char *namesection;
 
 	//déclaration des tructures
