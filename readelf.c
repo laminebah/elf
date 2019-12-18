@@ -85,10 +85,7 @@ int main (int argc,char **argv) {
 
 	elf_head = lecture_entete (felf);
 	if (elf_head == NULL)
-	{
-		fprintf(stderr, "Erreur d'initialisation de l'entete \n");
 		exit(1);
-	}
 	
 	sectionHeader=malloc(elf_head->e_shnum*sizeof(Elf32_Shdr));
 	get_sh_values(&sectionHeader,felf,elf_head);
@@ -99,6 +96,7 @@ int main (int argc,char **argv) {
 			//all : A compléter
 			print_header(elf_head);
 			print_section(felf,sectionHeader,elf_head);
+			affiche_symbole_table (symbtab,nbsymb,index,sectionHeader,felf);
 			break;
 		case XS:
 			//table section : A compléter
@@ -132,6 +130,7 @@ int main (int argc,char **argv) {
 	}
 	freemem (elf_head);
 	freemem (sectionHeader);
+	freemem (symbtab);
 	fclose (felf);
 	return EXIT_SUCCESS;
 }
