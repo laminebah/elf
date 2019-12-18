@@ -124,7 +124,9 @@ char *read_flags (char * flags, Elf32_Word flag){
 	return flags;
 }
 
-
+void print_espace (int i,int nb) {
+	for (;i <nb; i ++) printf(" ");
+}
 
 void print_section (FILE *file, Elf32_Shdr *T, Elf32_Ehdr *e){
 	
@@ -133,15 +135,15 @@ void print_section (FILE *file, Elf32_Shdr *T, Elf32_Ehdr *e){
 	int i;
 	
 
-	printf("Il y a %d en-têtes de section, débutant à l'adresse de décalage %d :\n",e->e_shnum, e->e_entry);
-	printf("En-têtes de section : \n");
-	printf("  [Nr] %-17s%-16s %-9s%-7s%-7s%-3s%-3s %-3s%-4s%-3s\n","Nom","Type","Adr","Decala.","Taille","ES","Fan","LN","Inf","Al");	
+	printf("Il y a %d en-têtes de section, débutant à l'adresse de décalage 0x%x:\n\n",e->e_shnum, e->e_shoff);
+	printf("En-têtes de section :\n");
+	printf("  [Nr] Nom               Type            Adr      Décala.Taille ES Fan LN Inf Al\n");	
 	for (i=0; i<e->e_shnum; i++){	 //tant qu'on a des entrées à lire
 		S = T[i];
 
 		// Récupération du type 
 		type = read_type(S);
-		printf("  [%2d]", i);
+		printf("  [%2d] ", i);
 		
 		//Récupération du flag
 		flag = malloc(sizeof(char*));
@@ -150,10 +152,11 @@ void print_section (FILE *file, Elf32_Shdr *T, Elf32_Ehdr *e){
 		// Récupération du nom
 		fseek(file, T[e->e_shstrndx].sh_offset+S.sh_name, SEEK_SET);
 		char *g __attribute__((unused)) = fgets(name, SIZENAME, file);
-
+		if (strcmp(name,".rel.debug_aranges") == 0) 
+			name [strlen(name) - 1] ='\0';
 		// Affichage de tous les éléments de la section
-		printf("%-17.17s\t", name);
-		printf("%-15s\t", type);
+		printf("%s", name);print_espace (strlen(name),18);
+		printf("%s", type);print_espace (strlen(type),15);
 		printf(" %08x", S.sh_addr);
 		printf(" %06x", S.sh_offset);
 		printf(" %06x", S.sh_size);
@@ -165,10 +168,11 @@ void print_section (FILE *file, Elf32_Shdr *T, Elf32_Ehdr *e){
 		printf(" %2d", S.sh_addralign);
 		printf("\n");
 	}
-	printf("\nClé des fanions : \n");
-	printf("  W (écriture), A (allocation), X (exécution), M (fusion), S (chaînes)\n");
-	printf("  I (info), L (ordre des liens), G (groupe), T (TLS), E (exclu), x (inconnu)\n");
-	printf("  O (traitement additionnel requis pour l'OS), o (spécifique à l'OS), p (spécifique au processeur)\n");
+	printf("Clé des fanions :\n");
+	printf("  W (écriture), A (allocation), X (exécution), M (fusion), S (chaînes), I (info),\n");
+	printf("  L (ordre des liens), O (traitement supplémentaire par l'OS requis), G (groupe),\n");
+	printf("  T (TLS), C (compressé), x (inconnu), o (spécifique à l'OS), E (exclu),\n");
+	printf("  y (purecode), p (processor specific)\n");
 	free(name);
 }
 
