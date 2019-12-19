@@ -28,4 +28,3 @@ ARM_runner_example_SOURCES=$(COMMON) $(SIMULATOR_INTERFACE) ARM_runner_example.c
 readelf_SOURCES= $(COMMON) $(readelf) Myreadelf/readelf.c
 
 EXTRA_DIST+=sample_run.sh
-
