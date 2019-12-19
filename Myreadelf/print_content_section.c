@@ -16,14 +16,15 @@
 
 //chercher si la section existe  
 int existe_section(unsigned char * sectionHexa, Elf32_Shdr* sectionHeader, Elf32_Ehdr* header, char * name){
+	int i;
 	if(name[0]==46){
-		for(int i=0;i< header->e_shnum;i++){
+		for(i=0;i< header->e_shnum;i++){
 			if(!strcmp(name,(char *)sectionHexa + sectionHeader[i].sh_name)){
 				return i;
 			}
 		}	
-	} else if(name[0]>='0' && name[0]<='9'){
-		return name[0]-'0';
+	} else {
+		return atoi(name);
 	}
 	return -2;	
 }
@@ -34,14 +35,15 @@ void hexdump(FILE *fichier,int addr,int size){
   int k,i;
 	  while(size>sizeof(tampon)){
 	    	k=fread(tampon,1,sizeof(tampon),fichier);
-	        printf("  0x%08x ",addr);
+	    	assert(k == sizeof(tampon));
+	        printf(" 0x%08x  ",addr);
 	        addr+=16;
 	        for(i=0;i<sizeof(tampon);i++){
 	            if(i<k){
 	                printf("%02x",tampon[i]);
 	            }
 	            else{
-	                printf(" ");
+	                printf("   ");
 	            }
 		    if((i+1)%4==0){
 			printf(" ");
@@ -61,7 +63,7 @@ void hexdump(FILE *fichier,int addr,int size){
 	    	size-=16;
 	  }
     	assert(fread(tampon,1,size,fichier) == size);
-        printf("  0x%08x ",addr);
+        printf(" 0x%08x  ",addr);
         addr+=16;
         for(i=0;i<N;i++){
             if(i<size){
@@ -77,10 +79,12 @@ void hexdump(FILE *fichier,int addr,int size){
 
     	for(i=0;i<N;i++){
             if(i<size){
-      			printf("%c",isprint(tampon[i])?tampon[i]:'.');
+      		printf("%c",isprint(tampon[i])?tampon[i]:'.');
             }
-            
-		}
+            else{
+                printf(" ");
+            }
+	}
     	printf("\n");
 }
 
@@ -93,15 +97,15 @@ void affiche_contentSection(unsigned char * sectionHexa, Elf32_Shdr* section, El
 				char* namevide;
 				if (strcmp((const char *)name, "0") == 0){
 					namevide = "";
-					printf("  La section « %s » n'a pas de données à vidanger.\n", namevide);
+					printf("  La section « %s » n'a pas de données à vidanger.\n", namevide);
 				}else{
-					printf("  La section « %s » n'a pas de données à vidanger.\n", name);
+					printf("  La section « %s » n'a pas de données à vidanger.\n", name);
 				}
 		}else{
 			if(n>=0){
 
 				printf("\n");
-				printf("  Vidange hexadécimale de la section « %s » : \n",name);
+				printf("  Vidange hexadécimale de la section « %s » : \n",name);
 				//fprintf(stdout,"\n");
 			
 				int addr= section[n].sh_addr;
@@ -119,7 +123,7 @@ void affiche_contentSection(unsigned char * sectionHexa, Elf32_Shdr* section, El
 }
 
 //lecture d'une section aprtir d'un fichier ELF
-void print_content_section(char* name, Elf32_Shdr* section ,Elf32_Ehdr* entete, FILE *fichier){
+unsigned char *print_content_section(char* name, Elf32_Shdr* section ,Elf32_Ehdr* entete, FILE *fichier, int bool){
 	Elf32_Shdr table;
 	//calcule de l'offset du debut du contenu d'une section par rapport a l'entete  
 	int offset = entete->e_shoff + entete->e_shstrndx * entete->e_shentsize;
@@ -132,8 +136,9 @@ void print_content_section(char* name, Elf32_Shdr* section ,Elf32_Ehdr* entete, 
     unsigned char * sectionHex = (unsigned char * )malloc( sizeof(unsigned char) * bswap_32(table.sh_size) );
     assert(sectionHex!=NULL);
     assert( bswap_32(table.sh_size) == fread(sectionHex, sizeof(char),bswap_32(table.sh_size), fichier) );	
-    affiche_contentSection(sectionHex, section, entete, fichier, name);
+    if(bool)
+    	affiche_contentSection(sectionHex, section, entete, fichier, name);
 
+    return sectionHex;
 }
-
 

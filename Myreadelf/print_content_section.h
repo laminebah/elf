@@ -20,7 +20,7 @@
 int existe_section(unsigned char * sectionHexa, Elf32_Shdr* sectionHeader, Elf32_Ehdr* header, char * name);
 void affiche_contentSection(unsigned char * sectionHexa, Elf32_Shdr* section, Elf32_Ehdr* header, FILE *fichier, char* name);
 void hexdump(FILE*,int,int);
-void print_content_section(char* name, Elf32_Shdr* section ,Elf32_Ehdr* entete, FILE *fichier);
+unsigned char *print_content_section(char* name, Elf32_Shdr* section ,Elf32_Ehdr* entete, FILE *fichier, int bool);
 
 
 #endif

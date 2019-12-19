@@ -8,6 +8,7 @@
 #include "print_content_section.h"
 #include "Elf_symbole.h"
 #include "print_symbole.h"
+#include "reloc_table.h"
 #define A  0 //toutes les commandes
 #define H  1 //entete
 #define X  2 //une section avec numéro ou name
@@ -60,7 +61,7 @@ int main (int argc,char **argv) {
 			exit(1);
 		}
 		//printf ("%s\n",argv[3]);
-		felf = fopen (argv[3],"r");
+		felf = fopen (argv[3],"rb");
 	} else {
 		if(argc < 3) {
 			fprintf(stderr, "Nombre d'argument incorrect \n");
@@ -68,35 +69,45 @@ int main (int argc,char **argv) {
 			exit(1);
 		}
 		//sprintf ("%s\n",argv[2]);
-		felf = fopen (argv[2],"r");
+		felf = fopen (argv[2],"rb");
 	}
 	if (felf == NULL) {
-		if (choix == X) printf("readelf::- ERREUR: « %s » n'est pas un fichier ordinaire\n",argv[3]);
-		else printf("readelf::- ERREUR:  « %s » n'est pas un fichier ordinaire\n",argv[2]);
-		exit(1);		
-	}	
+		fprintf(stderr, "Erreur d'ouverture du fichier \n");
+		return EXIT_FAILURE;		
+	}
+
 	char *namesection;
+	unsigned char *strtab=malloc(sizeof(unsigned char*));
 
 	//déclaration des tructures
 	Elf32_Ehdr * elf_head;
-	Elf32_Shdr *sectionHeader;
+	Elf32_Shdr *sectionHeader, *tabSection, *REL_tab, *SYM_tab;
 	Elf32_Sym *symbtab;
-	int nbsymb=0,index = 0;	
+	//Elf32_Rel **Rel;
+	int nbsymb = 0, index = 0;
 
 	elf_head = lecture_entete (felf);
 	if (elf_head == NULL)
+	{
+		fprintf(stderr, "Erreur d'initialisation de l'entete \n");
 		exit(1);
+	}
+	tabSection = malloc(elf_head->e_shnum*sizeof(Elf32_Shdr));
+	REL_tab = malloc(elf_head->e_shnum*sizeof(Elf32_Shdr));
+	SYM_tab = malloc(elf_head->e_shnum*sizeof(Elf32_Shdr));
+	//Elf32_Sym *tabSym = malloc(elf_head->e_shnum*sizeof(Elf32_Shdr));
+	//Rel = malloc(elf_head->e_shnum*sizeof(Elf32_Shdr));
+	sectionHeader = malloc(elf_head->e_shnum*sizeof(Elf32_Shdr));
 	
-	sectionHeader=malloc(elf_head->e_shnum*sizeof(Elf32_Shdr));
 	get_sh_values(&sectionHeader,felf,elf_head);
 	symbtab = lecture_symb(felf,sectionHeader,*elf_head,&nbsymb,&index);
+
 	//exécution commande option
 	switch (choix) {
 		case A:
 			//all : A compléter
 			print_header(elf_head);
 			print_section(felf,sectionHeader,elf_head);
-			affiche_symbole_table (symbtab,nbsymb,index,sectionHeader,felf);
 			break;
 		case XS:
 			//table section : A compléter
@@ -116,21 +127,41 @@ int main (int argc,char **argv) {
 								//si c'est entier on affiche à l'aide du numéro sinon à l'aide du nom
 			
 			namesection=malloc(sizeof(char)*strlen(argv[2])+1);
-			if (namesection == NULL) return EXIT_FAILURE;
+			if (namesection == NULL) 
+				return EXIT_FAILURE;
 			strcpy(namesection,"");
 			strcat(namesection,argv[2]);
-			print_content_section(namesection, sectionHeader, elf_head, felf);
+			strtab=print_content_section(namesection, sectionHeader, elf_head, felf, 1);
 			break;
 
 		case R:
 			//relocation
 		/*******A compléter*******/
-			break;
+			
+
+			namesection=malloc(sizeof(char)*strlen(argv[2])+1);
+			if (namesection == NULL) 
+				return EXIT_FAILURE;
+			strcpy(namesection,"");
+			strcat(namesection,argv[2]);
+			strtab=print_content_section(namesection, sectionHeader, elf_head, felf, 0);
+
+
+			affiche_Relocation(sectionHeader, *elf_head, symbtab, strtab, felf);
+			//REL_size = init_RelSymTab(felf, tabSection, *elf_head, REL_tab, SYM_tab, nbsymb);
+			//nbEntry = nb_entrees(REL_size, REL_tab);
+			//REL_tab_read(felf, REL_tab, REL_size, Rel, nbEntry, *elf_head);
+			//print_reloc(felf, *tabSection, REL_tab, elf_head, symbtab, Rel, nbsymb, index);
+			//break;
 
 	}
+
 	freemem (elf_head);
 	freemem (sectionHeader);
-	freemem (symbtab);
+	freemem(tabSection);
+	freemem(SYM_tab);
+	freemem(REL_tab);
 	fclose (felf);
+
 	return EXIT_SUCCESS;
 }
