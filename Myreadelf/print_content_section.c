@@ -17,8 +17,7 @@
 //chercher si la section existe  
 int existe_section(unsigned char * sectionHexa, Elf32_Shdr* sectionHeader, Elf32_Ehdr* header, char * name){
 	if(name[0]==46){
-		int i = 0;
-		for(;i< header->e_shnum;i++){
+		for(int i=0;i< header->e_shnum;i++){
 			if(!strcmp(name,(char *)sectionHexa + sectionHeader[i].sh_name)){
 				return i;
 			}
@@ -35,15 +34,14 @@ void hexdump(FILE *fichier,int addr,int size){
   int k,i;
 	  while(size>sizeof(tampon)){
 	    	k=fread(tampon,1,sizeof(tampon),fichier);
-	    	assert(k == sizeof(tampon));
-	        printf(" 0x%08x  ",addr);
+	        printf("  0x%08x ",addr);
 	        addr+=16;
 	        for(i=0;i<sizeof(tampon);i++){
 	            if(i<k){
 	                printf("%02x",tampon[i]);
 	            }
 	            else{
-	                printf("   ");
+	                printf(" ");
 	            }
 		    if((i+1)%4==0){
 			printf(" ");
@@ -63,7 +61,7 @@ void hexdump(FILE *fichier,int addr,int size){
 	    	size-=16;
 	  }
     	assert(fread(tampon,1,size,fichier) == size);
-        printf(" 0x%08x  ",addr);
+        printf("  0x%08x ",addr);
         addr+=16;
         for(i=0;i<N;i++){
             if(i<size){
@@ -79,31 +77,44 @@ void hexdump(FILE *fichier,int addr,int size){
 
     	for(i=0;i<N;i++){
             if(i<size){
-      		printf("%c",isprint(tampon[i])?tampon[i]:'.');
+      			printf("%c",isprint(tampon[i])?tampon[i]:'.');
             }
-            else{
-                printf(" ");
-            }
-	}
+            
+		}
     	printf("\n");
 }
 
 //fonction global d'affichage du contenu d'une section
-void affiche_contentSection(unsigned char * sectionHexa, Elf32_Shdr* section, Elf32_Ehdr* header, FILE *fichier, char* name){
-		int n = existe_section(sectionHexa, section, header, name);
-		if(n>=0){
-			unsigned char *name = (unsigned char *)sectionHexa + (section[n].sh_name);
-			printf("Vidange hexadécimale de la section « %s »:\n",name);
+void affiche_contentSection(unsigned char * sectionHexa, Elf32_Shdr* section, Elf32_Ehdr* header, FILE *fichier, char* nm){
+		int n = existe_section(sectionHexa, section, header, nm);
+		unsigned char *name = (unsigned char *)sectionHexa + (section[n].sh_name);
+		//printf("size: %d\n",section[n].sh_size);
+		if(section[n].sh_type == SHT_NOBITS || section[n].sh_type == SHT_NULL || section[n].sh_size == 0){
+				char* namevide;
+				if (strcmp((const char *)name, "0") == 0){
+					namevide = "";
+					printf("  La section « %s » n'a pas de données à vidanger.\n", namevide);
+				}else{
+					printf("  La section « %s » n'a pas de données à vidanger.\n", name);
+				}
+		}else{
+			if(n>=0){
 
-			int addr= section[n].sh_addr;
-		    int size= section[n].sh_size;
+				printf("\n");
+				printf("  Vidange hexadécimale de la section « %s » : \n",name);
+				//fprintf(stdout,"\n");
+			
+				int addr= section[n].sh_addr;
+				int size= section[n].sh_size;
 
-			assert(fseek(fichier, section[n].sh_offset, SEEK_SET) != -1);
-			hexdump(fichier,addr,size);
-
-		} else {
-			fprintf(stderr,"Le nom de table non existant\n");
-		
+				assert(fseek(fichier, section[n].sh_offset, SEEK_SET) != -1);
+				
+				hexdump(fichier,addr,size);
+				printf("\n");
+			} else {
+				printf("readelf: AVERTISSEMENT: La section « %s » n'a pas été vidangée parce qu'inexistante !", name);
+			
+			}
 		}	
 }
 
