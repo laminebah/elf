@@ -162,7 +162,7 @@ void affiche_Relocation(Elf32_Shdr*Sec, Elf32_Ehdr h, Elf32_Sym *Sym, unsigned c
 
 				print_RelTab_head(RelSize, strtab+Sec[i].sh_name, Sec[i].sh_offset);
 
-				Elf32_Rel *REL_tab__=read_REL_tab(h, Sec, file, i);
+				Elf32_Rel *REL_tab=read_REL_tab(h, Sec, file, i);
 
 
 				for(j=0;j<RelSize;j++){
