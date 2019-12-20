@@ -1,6 +1,6 @@
 #!/bin/sh
 example="Examples_loader/*"
-readelf -h Examples_loader/example1.o > script_test/tmp1
+readelf -h Examples_loader/example1.o > Scripts_tests/tmp1
 if [ $# -eq 0 ] 
 then
 	echo "Vous arguments sont pas suffisants pour exécuter le script"
@@ -15,9 +15,9 @@ else
 			then
 				echo "$file -- error"
 			else
-				./readelf -h $file > script_test/tmp0.txt
-				readelf -h $file > script_test/tmp1.txt
-				if diff script_test/tmp0.txt script_test/tmp1.txt > /dev/null
+				./readelf -h $file > Scripts_tests/tmp0.txt
+				readelf -h $file > Scripts_tests/tmp1.txt
+				if diff Scripts_tests/tmp0.txt Scripts_tests/tmp1.txt > /dev/null
 				then 
 					echo "$file -- success"
 				else
@@ -34,9 +34,9 @@ else
 			then
 				echo "$file -- error"
 			else 
-				./readelf -s $file > script_test/tmp0.txt
-				readelf -s $file > script_test/tmp1.txt
-				if diff script_test/tmp0.txt script_test/tmp1.txt > /dev/null
+				./readelf -s $file > Scripts_tests/tmp0.txt
+				readelf -s $file > Scripts_tests/tmp1.txt
+				if diff script_test/tmp0.txt Scripts_tests/tmp1.txt > /dev/null
 				then 
 					echo "$file -- success"
 				else
@@ -53,9 +53,9 @@ else
 			then
 				echo "$file -- error"
 			else
-				./readelf -S $file > script_test/tmp0.txt
-				readelf -S $file > script_test/tmp1.txt
-				if diff script_test/tmp0.txt script_test/tmp1.txt > /dev/null
+				./readelf -S $file > Scripts_tests/tmp0.txt
+				readelf -S $file > Scripts_tests/tmp1.txt
+				if diff Scripts_tests/tmp0.txt Scripts_tests/tmp1.txt > /dev/null
 				then 
 					echo "$file -- success"
 				else
@@ -65,5 +65,5 @@ else
 		done
 	fi
 	
-	rm script_test/tmp0.txt script_test/tmp1.txt
+	rm Scripts_tests/tmp0.txt Scripts_tests/tmp1.txt
 fi
