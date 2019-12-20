@@ -36,7 +36,7 @@ else
 			else 
 				./readelf -s $file > Scripts_tests/tmp0.txt
 				readelf -s $file > Scripts_tests/tmp1.txt
-				if diff script_test/tmp0.txt Scripts_tests/tmp1.txt > /dev/null
+				if diff Scripts_tests/tmp0.txt Scripts_tests/tmp1.txt > /dev/null
 				then 
 					echo "$file -- success"
 				else
