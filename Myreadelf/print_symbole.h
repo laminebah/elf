@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/*ce module gère l'affiche de la table des symboles */
+
 void print_type_symb(int info);
 
 void print_link(int info);
