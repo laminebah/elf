@@ -1,3 +1,11 @@
+//GROUPE 13
+//BAH    MAMADOU
+//HAFID  MOHAMED
+//BELAID MOHAMED
+//DAN  	 MUSHINGA
+//BAH    AMADOU
+//AMANI  BELAID
+
 #include "Elf_header.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,27 +34,27 @@ int main (int argc,char **argv) {
 		switch (option) {
 			case 'a':
 					//all
-					choix = 0;
+					choix = A;
 				break;
 			case 'h':
 					//entete
-					choix = 1;
+					choix = H;
 				break;
 			case 'x':
 					//une section
-					choix = 2;
+					choix = X;
 				break;
 			case 's':
 					//symbole
-					choix = 5;
+					choix = S;
 				break;
 			case 'r':
 					//relocation
-					choix = 4;
+					choix = R;
 				break;
 			case 'S':
 					//table section
-					choix = 3;
+					choix = XS;
 				break;
 			default:
 				return EXIT_FAILURE;
@@ -55,20 +63,20 @@ int main (int argc,char **argv) {
 	}
 	FILE *felf;
 	if (choix == X) {
+		//pour l'option -x le nom du fichier correspont à la variable argv [3]
 		if(argc < 4) {
 			fprintf(stderr, "Nombre d'argument incorrect \n");
 			fprintf(stderr, "Usage: %s fichier \n", argv[0]);
 			exit(1);
 		}
-		//printf ("%s\n",argv[3]);
 		felf = fopen (argv[3],"rb");
 	} else {
+		//pour les autres options  le nom du fichier correspont à la variable argv [2]
 		if(argc < 3) {
 			fprintf(stderr, "Nombre d'argument incorrect \n");
 			fprintf(stderr, "Usage: %s fichier \n", argv[0]);
 			exit(1);
 		}
-		//sprintf ("%s\n",argv[2]);
 		felf = fopen (argv[2],"rb");
 	}
 	if (felf == NULL) {
@@ -83,9 +91,10 @@ int main (int argc,char **argv) {
 	Elf32_Ehdr * elf_head;
 	Elf32_Shdr *sectionHeader, *tabSection, *REL_tab, *SYM_tab;
 	Elf32_Sym *symbtab;
-	//Elf32_Rel **Rel;
+
 	int nbsymb = 0, index = 0;
 
+	//initalisation de la structure de l'entete
 	elf_head = lecture_entete (felf);
 	if (elf_head == NULL)
 	{
@@ -95,22 +104,22 @@ int main (int argc,char **argv) {
 	tabSection = malloc(elf_head->e_shnum*sizeof(Elf32_Shdr));
 	REL_tab = malloc(elf_head->e_shnum*sizeof(Elf32_Shdr));
 	SYM_tab = malloc(elf_head->e_shnum*sizeof(Elf32_Shdr));
-	//Elf32_Sym *tabSym = malloc(elf_head->e_shnum*sizeof(Elf32_Shdr));
-	//Rel = malloc(elf_head->e_shnum*sizeof(Elf32_Shdr));
 	sectionHeader = malloc(elf_head->e_shnum*sizeof(Elf32_Shdr));
-	
+
+	//initialisation de la table des sections
 	get_sh_values(&sectionHeader,felf,elf_head);
+	//initalisation de la structure correspondante à la table des symboles
 	symbtab = lecture_symb(felf,sectionHeader,*elf_head,&nbsymb,&index);
 
 	//exécution commande option
 	switch (choix) {
 		case A:
-			//all : A compléter
+			//all : 
 			print_header(elf_head);
 			print_section(felf,sectionHeader,elf_head);
 			break;
 		case XS:
-			//table section : A compléter
+			//table section : 
 			print_section(felf,sectionHeader,elf_head);
 			break;
 		case H:
@@ -118,14 +127,10 @@ int main (int argc,char **argv) {
 			print_header(elf_head);
 			break;
 		case S:
-			//symbole : A compléter
+			//symbole :
 			affiche_symbole_table (symbtab,nbsymb,index,sectionHeader,felf);
 			break;
-		case X:
-			//contenu_section : A compléter
-								//une section : soit par N° section ou Name sections
-								//si c'est entier on affiche à l'aide du numéro sinon à l'aide du nom
-			
+		case X://le contenu d'une section
 			namesection=malloc(sizeof(char)*strlen(argv[2])+1);
 			if (namesection == NULL) 
 				return EXIT_FAILURE;
@@ -136,31 +141,23 @@ int main (int argc,char **argv) {
 
 		case R:
 			//relocation
-		/*******A compléter*******/
-			
-
 			namesection=malloc(sizeof(char)*strlen(argv[2])+1);
 			if (namesection == NULL) 
 				return EXIT_FAILURE;
 			strcpy(namesection,"");
 			strcat(namesection,argv[2]);
 			strtab=print_content_section(namesection, sectionHeader, elf_head, felf, 0);
-
-
 			affiche_Relocation(sectionHeader, *elf_head, symbtab, strtab, felf);
-			//REL_size = init_RelSymTab(felf, tabSection, *elf_head, REL_tab, SYM_tab, nbsymb);
-			//nbEntry = nb_entrees(REL_size, REL_tab);
-			//REL_tab_read(felf, REL_tab, REL_size, Rel, nbEntry, *elf_head);
-			//print_reloc(felf, *tabSection, REL_tab, elf_head, symbtab, Rel, nbsymb, index);
-			//break;
 
 	}
 
+	//libérationde toutes strtuctures allouées
 	freemem (elf_head);
 	freemem (sectionHeader);
 	freemem(tabSection);
 	freemem(SYM_tab);
 	freemem(REL_tab);
+	//fermeture du fichier ouvert en lecture
 	fclose (felf);
 
 	return EXIT_SUCCESS;
