@@ -1,16 +1,14 @@
 #include <string.h>
 #include <stdlib.h>
-#include "Elf_header.h"
 #include <assert.h>
 #include <byteswap.h>
-#include <elf.h>
 #include "print_content_section.h"
 
 
 
-/////////////////////////////////////////////////////////
-//////////////////////// étape 3 ////////////////////////
-/////////////////////////////////////////////////////////
+								/////////////////////////////////////////////////////////
+								//////////////////////// étape 3 ////////////////////////
+								/////////////////////////////////////////////////////////
 
 
 
@@ -28,69 +26,51 @@ int existe_section(unsigned char * sectionHexa, Elf32_Shdr* sectionHeader, Elf32
 	}
 	return -2;	
 }
-
-//afficher le contenu brute d'une section en hex 
-void hexdump(FILE *fichier,int addr,int size){
-  unsigned char tampon[N]; 
-  int k,i;
-	  while(size>sizeof(tampon)){
-	    	k=fread(tampon,1,sizeof(tampon),fichier);
-	    	assert(k == sizeof(tampon));
-	        printf(" 0x%08x  ",addr);
+//affiche le contenu d'un tampon en format hex 
+void hexdump(int addr,unsigned char tampon[N],int k){
+			int i;
+		    printf(" 0x%08x  ",addr);
 	        addr+=16;
-	        for(i=0;i<sizeof(tampon);i++){
+	        for(i=0;i<N;i++){
 	            if(i<k){
 	                printf("%02x",tampon[i]);
 	            }
 	            else{
 	                printf("   ");
 	            }
-		    if((i+1)%4==0){
-			printf(" ");
-		    } 
-	         }
-
-	    	for(i=0;i<sizeof(tampon);i++){
+			    if((i+1)%4==0){
+				printf(" ");
+			    } 
+			}
+	    	for(i=0;i<N;i++){
 	            if(i<k){
-	      		printf("%c",isprint(tampon[i])?tampon[i]:'.');
+	      			printf("%c",isprint(tampon[i])?tampon[i]:'.');
 	            }
 	            else{
 	                printf(" ");
 	            }
 	    	}
-
 	    	printf("\n");
-	    	size-=16;
-	  }
-    	assert(fread(tampon,1,size,fichier) == size);
-        printf(" 0x%08x  ",addr);
-        addr+=16;
-        for(i=0;i<N;i++){
-            if(i<size){
-                printf("%02x",tampon[i]);
-            }
-            else{
-                printf("  ");
-            }
-	    if((i+1)%4==0){
-		printf(" ");
-	    } 
-         }
+}
 
-    	for(i=0;i<N;i++){
-            if(i<size){
-      		printf("%c",isprint(tampon[i])?tampon[i]:'.');
-            }
-            else{
-                printf(" ");
-            }
-	}
-    	printf("\n");
+//lecture d`une chaine de caractére a partir d`une addresse donnée 
+void lire_contentsec(FILE *fichier,int addr,int size){
+  unsigned char tampon[N]; 
+  int k;
+		while(size>sizeof(tampon)){
+	    	k=fread(tampon,1,sizeof(tampon),fichier);
+	    	assert(k == sizeof(tampon));
+	    	hexdump(addr,tampon,k);
+	    	size-=16;
+	  	}
+	  	k=fread(tampon,1,size,fichier);
+    	assert(k == size);
+	   	hexdump(addr,tampon,k);
 }
 
 //fonction global d'affichage du contenu d'une section
 void affiche_contentSection(unsigned char * sectionHexa, Elf32_Shdr* section, Elf32_Ehdr* header, FILE *fichier, char* nm){
-		int n = existe_section(sectionHexa, section, header, nm);
+		int k,n = existe_section(sectionHexa, section, header, nm);
 		unsigned char *name = (unsigned char *)sectionHexa + (section[n].sh_name);
 		//printf("size: %d\n",section[n].sh_size);
 		if(section[n].sh_type == SHT_NOBITS || section[n].sh_type == SHT_NULL || section[n].sh_size == 0){
@@ -105,15 +85,12 @@ void affiche_contentSection(unsigned char * sectionHexa, Elf32_Shdr* section, El
 			if(n>=0){
 
 				printf("\n");
-				printf("  Vidange hexadécimale de la section « %s » : \n",name);
-				//fprintf(stdout,"\n");
-			
+				printf("  Vidange hexadécimale de la section « %s » : \n",name);			
 				int addr= section[n].sh_addr;
 				int size= section[n].sh_size;
-
-				assert(fseek(fichier, section[n].sh_offset, SEEK_SET) != -1);
-				
-				hexdump(fichier,addr,size);
+				k = fseek(fichier, section[n].sh_offset, SEEK_SET);
+				assert(k != -1);
+				lire_contentsec(fichier,addr,size);
 				printf("\n");
 			} else {
 				printf("readelf: AVERTISSEMENT: La section « %s » n'a pas été vidangée parce qu'inexistante !", name);
@@ -122,23 +99,27 @@ void affiche_contentSection(unsigned char * sectionHexa, Elf32_Shdr* section, El
 		}	
 }
 
-//lecture d'une section aprtir d'un fichier ELF
+//lecture d'une section aprtir d'un fichier ELF (+ l`affichage depend du boolean bool) 
 unsigned char *print_content_section(char* name, Elf32_Shdr* section ,Elf32_Ehdr* entete, FILE *fichier, int bool){
 	Elf32_Shdr table;
+	int k;
 	//calcule de l'offset du debut du contenu d'une section par rapport a l'entete  
 	int offset = entete->e_shoff + entete->e_shstrndx * entete->e_shentsize;
 	//se deplacer par le debut du des entetes de section + inde
-	assert(fseek(fichier, offset , SEEK_SET) != -1);
+	k=fseek(fichier, offset , SEEK_SET);
+	assert(k != -1);
 	//charger la table des strings
-    assert(sizeof(Elf32_Shdr) ==fread(&table, sizeof(char), sizeof(Elf32_Shdr), fichier));  
-    assert(fseek(fichier,bswap_32(table.sh_offset), SEEK_SET) != -1);
+	k = fread(&table, sizeof(char), sizeof(Elf32_Shdr), fichier);
+    assert(k ==sizeof(Elf32_Shdr));  
+    k=fseek(fichier,bswap_32(table.sh_offset), SEEK_SET);
+    assert(k != -1);
     //alocations de la table des string
     unsigned char * sectionHex = (unsigned char * )malloc( sizeof(unsigned char) * bswap_32(table.sh_size) );
     assert(sectionHex!=NULL);
-    assert( bswap_32(table.sh_size) == fread(sectionHex, sizeof(char),bswap_32(table.sh_size), fichier) );	
+    k=fread(sectionHex, sizeof(char),bswap_32(table.sh_size), fichier);
+    assert(k == bswap_32(table.sh_size) );	
     if(bool)
     	affiche_contentSection(sectionHex, section, entete, fichier, name);
 
     return sectionHex;
 }
-
