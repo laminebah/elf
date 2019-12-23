@@ -44,7 +44,7 @@ void lire_contentsec(FILE *,int,int);
 
 /***	Cette fonction permet de lire le contenu d`une section 
 		Données : nom d'une section, table des sections, l'entete , un fichier ELF et un boolean
-		Résultat: aucun
+		Résultat: chaine de caractére
 ***/
 unsigned char *print_content_section(char*, Elf32_Shdr*, Elf32_Ehdr*, FILE *, int);
 
