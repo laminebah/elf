@@ -72,7 +72,6 @@ void lire_contentsec(FILE *fichier,int addr,int size){
 void affiche_contentSection(unsigned char * sectionHexa, Elf32_Shdr* section, Elf32_Ehdr* header, FILE *fichier, char* nm){
 		int k,n = existe_section(sectionHexa, section, header, nm);
 		unsigned char *name = (unsigned char *)sectionHexa + (section[n].sh_name);
-		//printf("size: %d\n",section[n].sh_size);
 		if(section[n].sh_type == SHT_NOBITS || section[n].sh_type == SHT_NULL || section[n].sh_size == 0){
 				char* namevide;
 				if (strcmp((const char *)name, "0") == 0){
