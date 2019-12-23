@@ -5,7 +5,9 @@
 #include <ctype.h>
 #define N 16
 
-						            	/*  gère l'affichage du contenu d'une section   */
+							/*  gère l'affichage du contenu d'une section   */
+
+
 
 
 /***	Cette fonction test l' existance d' une section 
@@ -23,11 +25,20 @@ void affiche_contentSection(unsigned char *, Elf32_Shdr*, Elf32_Ehdr*, FILE *, c
 
 
 
-/***	Cette fonction est utilsée par la fonction affiche_contentSection  pour faire l`affichage en format hexa
+/***	Cette fonction est utilsée par la fonction lire_contentsec  pour faire l`affichage en format hexa
+		Données : une addresse, un tampon et une taille
+		Résultat: aucun
+***/
+void hexdump(int,unsigned char[],int);
+
+
+
+
+/***	Cette fonction est utilsée par la fonction affiche_contentSection, permet de lire une chaine à partir d`une addresse 
 		Données :  un fichier ELF, une adresse et une taille
 		Résultat: aucun
 ***/
-void hexdump(FILE*,int,int);
+void lire_contentsec(FILE *,int,int);
 
 
 
