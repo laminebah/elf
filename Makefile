@@ -86,7 +86,8 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = ARM_runner_example$(EXEEXT) readelf$(EXEEXT)
+bin_PROGRAMS = ARM_runner_example$(EXEEXT) readelf$(EXEEXT) \
+	myld$(EXEEXT)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/hostsubdir.m4 \
@@ -114,6 +115,11 @@ am__objects_3 = Elf_header.$(OBJEXT) printhead.$(OBJEXT) \
 	section_header.$(OBJEXT) print_content_section.$(OBJEXT) \
 	Elf_symbole.$(OBJEXT) print_symbole.$(OBJEXT) \
 	reloc_table.$(OBJEXT)
+am__objects_4 = $(am__objects_3) fusion.$(OBJEXT)
+am_myld_OBJECTS = $(am__objects_1) $(am__objects_4) myld.$(OBJEXT)
+myld_OBJECTS = $(am_myld_OBJECTS)
+myld_LDADD = $(LDADD)
+myld_DEPENDENCIES =
 am_readelf_OBJECTS = $(am__objects_1) $(am__objects_3) \
 	readelf.$(OBJEXT)
 readelf_OBJECTS = $(am_readelf_OBJECTS)
@@ -157,8 +163,10 @@ am__v_LEX_ = $(am__v_LEX_$(AM_DEFAULT_VERBOSITY))
 am__v_LEX_0 = @echo "  LEX     " $@;
 am__v_LEX_1 = 
 YLWRAP = $(top_srcdir)/build-aux/ylwrap
-SOURCES = $(ARM_runner_example_SOURCES) $(readelf_SOURCES)
-DIST_SOURCES = $(ARM_runner_example_SOURCES) $(readelf_SOURCES)
+SOURCES = $(ARM_runner_example_SOURCES) $(myld_SOURCES) \
+	$(readelf_SOURCES)
+DIST_SOURCES = $(ARM_runner_example_SOURCES) $(myld_SOURCES) \
+	$(readelf_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -251,12 +259,12 @@ distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /home/b/bahm/Desktop/elf_linker-1.0/build-aux/missing aclocal-1.15
+ACLOCAL = ${SHELL} /home/b/bahm/Desktop/elf-master/build-aux/missing aclocal-1.15
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
-AUTOCONF = ${SHELL} /home/b/bahm/Desktop/elf_linker-1.0/build-aux/missing autoconf
-AUTOHEADER = ${SHELL} /home/b/bahm/Desktop/elf_linker-1.0/build-aux/missing autoheader
-AUTOMAKE = ${SHELL} /home/b/bahm/Desktop/elf_linker-1.0/build-aux/missing automake-1.15
+AUTOCONF = ${SHELL} /home/b/bahm/Desktop/elf-master/build-aux/missing autoconf
+AUTOHEADER = ${SHELL} /home/b/bahm/Desktop/elf-master/build-aux/missing autoheader
+AUTOMAKE = ${SHELL} /home/b/bahm/Desktop/elf-master/build-aux/missing automake-1.15
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
@@ -285,7 +293,7 @@ LEX_OUTPUT_ROOT = lex.yy
 LIBOBJS = 
 LIBS = 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/b/bahm/Desktop/elf_linker-1.0/build-aux/missing makeinfo
+MAKEINFO = ${SHELL} /home/b/bahm/Desktop/elf-master/build-aux/missing makeinfo
 MKDIR_P = /bin/mkdir -p
 OBJEXT = o
 PACKAGE = elf_linker
@@ -300,10 +308,10 @@ SET_MAKE =
 SHELL = /bin/bash
 STRIP = 
 VERSION = 1.0
-abs_builddir = /home/b/bahm/Desktop/elf_linker-1.0
-abs_srcdir = /home/b/bahm/Desktop/elf_linker-1.0
-abs_top_builddir = /home/b/bahm/Desktop/elf_linker-1.0
-abs_top_srcdir = /home/b/bahm/Desktop/elf_linker-1.0
+abs_builddir = /home/b/bahm/Desktop/elf-master
+abs_srcdir = /home/b/bahm/Desktop/elf-master
+abs_top_builddir = /home/b/bahm/Desktop/elf-master
+abs_top_srcdir = /home/b/bahm/Desktop/elf-master
 ac_ct_CC = gcc
 am__include = include
 am__leading_dot = .
@@ -322,7 +330,7 @@ host_alias =
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/b/bahm/Desktop/elf_linker-1.0/build-aux/install-sh
+install_sh = ${SHELL} /home/b/bahm/Desktop/elf-master/build-aux/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -354,11 +362,14 @@ AM_CFLAGS = -Wall -Werror -g -D DEBUG -D WARNING -D \
 LDADD = -lpthread
 SUBDIRS = . Examples_loader
 COMMON = debug.h debug.c util.h util.c
-readelf = Myreadelf/Elf_header.h Myreadelf/Elf_header.c Myreadelf/printhead.h Myreadelf/printhead.c Myreadelf/section_header.h Myreadelf/section_header.c  Myreadelf/print_content_section.h Myreadelf/print_content_section.c Myreadelf/Elf_symbole.h Myreadelf/Elf_symbole.c Myreadelf/print_symbole.h Myreadelf/print_symbole.c Myreadelf/reloc_table.c Myreadelf/reloc_table.h
+readelf = Myreadelf/Elf_header.h Myreadelf/Elf_header.c Myreadelf/printhead.h Myreadelf/printhead.c Myreadelf/section_header.h Myreadelf/section_header.c  Myreadelf/print_content_section.h Myreadelf/print_content_section.c Myreadelf/Elf_symbole.h Myreadelf/Elf_symbole.c Myreadelf/print_symbole.h Myreadelf/print_symbole.c Myreadelf/reloc_table.h Myreadelf/reloc_table.c 
+myld = $(readelf) Myreadelf/fusion.h Myreadelf/fusion.c
+#Myreadelf/Elf_header.h Myreadelf/Elf_header.c Myreadelf/printhead.h Myreadelf/printhead.c Myreadelf/section_header.h Myreadelf/section_header.c Myreadelf/fusion.h Myreadelf/fusion.c Myreadelf/Elf_symbole.h Myreadelf/Elf_symbole.c Myreadelf/print_symbole.h Myreadelf/print_symbole.c Myreadelf/reloc_table.h Myreadelf/reloc_table.c 
 EXTRA_DIST = filtre.pl sample_run.sh
 SIMULATOR_INTERFACE = csapp.h csapp.c scanner.h scanner.l gdb_protocol.h gdb_protocol.c arm_simulator_interface.h arm_simulator_interface.c
 ARM_runner_example_SOURCES = $(COMMON) $(SIMULATOR_INTERFACE) ARM_runner_example.c
 readelf_SOURCES = $(COMMON) $(readelf) Myreadelf/readelf.c
+myld_SOURCES = $(COMMON) $(myld) Myreadelf/myld.c
 all: all-recursive
 
 .SUFFIXES:
@@ -443,6 +454,10 @@ ARM_runner_example$(EXEEXT): $(ARM_runner_example_OBJECTS) $(ARM_runner_example_
 	@rm -f ARM_runner_example$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(ARM_runner_example_OBJECTS) $(ARM_runner_example_LDADD) $(LIBS)
 
+myld$(EXEEXT): $(myld_OBJECTS) $(myld_DEPENDENCIES) $(EXTRA_myld_DEPENDENCIES) 
+	@rm -f myld$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(myld_OBJECTS) $(myld_LDADD) $(LIBS)
+
 readelf$(EXEEXT): $(readelf_OBJECTS) $(readelf_DEPENDENCIES) $(EXTRA_readelf_DEPENDENCIES) 
 	@rm -f readelf$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(readelf_OBJECTS) $(readelf_LDADD) $(LIBS)
@@ -459,7 +474,9 @@ include ./$(DEPDIR)/Elf_symbole.Po
 include ./$(DEPDIR)/arm_simulator_interface.Po
 include ./$(DEPDIR)/csapp.Po
 include ./$(DEPDIR)/debug.Po
+include ./$(DEPDIR)/fusion.Po
 include ./$(DEPDIR)/gdb_protocol.Po
+include ./$(DEPDIR)/myld.Po
 include ./$(DEPDIR)/print_content_section.Po
 include ./$(DEPDIR)/print_symbole.Po
 include ./$(DEPDIR)/printhead.Po
@@ -580,6 +597,34 @@ reloc_table.obj: Myreadelf/reloc_table.c
 #	$(AM_V_CC)source='Myreadelf/reloc_table.c' object='reloc_table.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 #	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o reloc_table.obj `if test -f 'Myreadelf/reloc_table.c'; then $(CYGPATH_W) 'Myreadelf/reloc_table.c'; else $(CYGPATH_W) '$(srcdir)/Myreadelf/reloc_table.c'; fi`
+
+fusion.o: Myreadelf/fusion.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fusion.o -MD -MP -MF $(DEPDIR)/fusion.Tpo -c -o fusion.o `test -f 'Myreadelf/fusion.c' || echo '$(srcdir)/'`Myreadelf/fusion.c
+	$(AM_V_at)$(am__mv) $(DEPDIR)/fusion.Tpo $(DEPDIR)/fusion.Po
+#	$(AM_V_CC)source='Myreadelf/fusion.c' object='fusion.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fusion.o `test -f 'Myreadelf/fusion.c' || echo '$(srcdir)/'`Myreadelf/fusion.c
+
+fusion.obj: Myreadelf/fusion.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fusion.obj -MD -MP -MF $(DEPDIR)/fusion.Tpo -c -o fusion.obj `if test -f 'Myreadelf/fusion.c'; then $(CYGPATH_W) 'Myreadelf/fusion.c'; else $(CYGPATH_W) '$(srcdir)/Myreadelf/fusion.c'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/fusion.Tpo $(DEPDIR)/fusion.Po
+#	$(AM_V_CC)source='Myreadelf/fusion.c' object='fusion.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fusion.obj `if test -f 'Myreadelf/fusion.c'; then $(CYGPATH_W) 'Myreadelf/fusion.c'; else $(CYGPATH_W) '$(srcdir)/Myreadelf/fusion.c'; fi`
+
+myld.o: Myreadelf/myld.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT myld.o -MD -MP -MF $(DEPDIR)/myld.Tpo -c -o myld.o `test -f 'Myreadelf/myld.c' || echo '$(srcdir)/'`Myreadelf/myld.c
+	$(AM_V_at)$(am__mv) $(DEPDIR)/myld.Tpo $(DEPDIR)/myld.Po
+#	$(AM_V_CC)source='Myreadelf/myld.c' object='myld.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o myld.o `test -f 'Myreadelf/myld.c' || echo '$(srcdir)/'`Myreadelf/myld.c
+
+myld.obj: Myreadelf/myld.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT myld.obj -MD -MP -MF $(DEPDIR)/myld.Tpo -c -o myld.obj `if test -f 'Myreadelf/myld.c'; then $(CYGPATH_W) 'Myreadelf/myld.c'; else $(CYGPATH_W) '$(srcdir)/Myreadelf/myld.c'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/myld.Tpo $(DEPDIR)/myld.Po
+#	$(AM_V_CC)source='Myreadelf/myld.c' object='myld.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o myld.obj `if test -f 'Myreadelf/myld.c'; then $(CYGPATH_W) 'Myreadelf/myld.c'; else $(CYGPATH_W) '$(srcdir)/Myreadelf/myld.c'; fi`
 
 readelf.o: Myreadelf/readelf.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT readelf.o -MD -MP -MF $(DEPDIR)/readelf.Tpo -c -o readelf.o `test -f 'Myreadelf/readelf.c' || echo '$(srcdir)/'`Myreadelf/readelf.c

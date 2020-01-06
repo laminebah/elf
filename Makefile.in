@@ -86,7 +86,8 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = ARM_runner_example$(EXEEXT) readelf$(EXEEXT)
+bin_PROGRAMS = ARM_runner_example$(EXEEXT) readelf$(EXEEXT) \
+	myld$(EXEEXT)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/hostsubdir.m4 \
@@ -112,7 +113,13 @@ ARM_runner_example_LDADD = $(LDADD)
 ARM_runner_example_DEPENDENCIES =
 am__objects_3 = Elf_header.$(OBJEXT) printhead.$(OBJEXT) \
 	section_header.$(OBJEXT) print_content_section.$(OBJEXT) \
-	Elf_symbole.$(OBJEXT) print_symbole.$(OBJEXT)
+	Elf_symbole.$(OBJEXT) print_symbole.$(OBJEXT) \
+	reloc_table.$(OBJEXT)
+am__objects_4 = $(am__objects_3) fusion.$(OBJEXT)
+am_myld_OBJECTS = $(am__objects_1) $(am__objects_4) myld.$(OBJEXT)
+myld_OBJECTS = $(am_myld_OBJECTS)
+myld_LDADD = $(LDADD)
+myld_DEPENDENCIES =
 am_readelf_OBJECTS = $(am__objects_1) $(am__objects_3) \
 	readelf.$(OBJEXT)
 readelf_OBJECTS = $(am_readelf_OBJECTS)
@@ -156,8 +163,10 @@ am__v_LEX_ = $(am__v_LEX_@AM_DEFAULT_V@)
 am__v_LEX_0 = @echo "  LEX     " $@;
 am__v_LEX_1 = 
 YLWRAP = $(top_srcdir)/build-aux/ylwrap
-SOURCES = $(ARM_runner_example_SOURCES) $(readelf_SOURCES)
-DIST_SOURCES = $(ARM_runner_example_SOURCES) $(readelf_SOURCES)
+SOURCES = $(ARM_runner_example_SOURCES) $(myld_SOURCES) \
+	$(readelf_SOURCES)
+DIST_SOURCES = $(ARM_runner_example_SOURCES) $(myld_SOURCES) \
+	$(readelf_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -353,11 +362,14 @@ AM_CFLAGS = -Wall -Werror -g -D DEBUG -D WARNING -D \
 LDADD = -lpthread
 SUBDIRS = . Examples_loader
 COMMON = debug.h debug.c util.h util.c
-readelf = Myreadelf/Elf_header.h Myreadelf/Elf_header.c Myreadelf/printhead.h Myreadelf/printhead.c Myreadelf/section_header.h Myreadelf/section_header.c  Myreadelf/print_content_section.h Myreadelf/print_content_section.c Myreadelf/Elf_symbole.h Myreadelf/Elf_symbole.c Myreadelf/print_symbole.h Myreadelf/print_symbole.c
+readelf = Myreadelf/Elf_header.h Myreadelf/Elf_header.c Myreadelf/printhead.h Myreadelf/printhead.c Myreadelf/section_header.h Myreadelf/section_header.c  Myreadelf/print_content_section.h Myreadelf/print_content_section.c Myreadelf/Elf_symbole.h Myreadelf/Elf_symbole.c Myreadelf/print_symbole.h Myreadelf/print_symbole.c Myreadelf/reloc_table.h Myreadelf/reloc_table.c 
+myld = $(readelf) Myreadelf/fusion.h Myreadelf/fusion.c
+#Myreadelf/Elf_header.h Myreadelf/Elf_header.c Myreadelf/printhead.h Myreadelf/printhead.c Myreadelf/section_header.h Myreadelf/section_header.c Myreadelf/fusion.h Myreadelf/fusion.c Myreadelf/Elf_symbole.h Myreadelf/Elf_symbole.c Myreadelf/print_symbole.h Myreadelf/print_symbole.c Myreadelf/reloc_table.h Myreadelf/reloc_table.c 
 EXTRA_DIST = filtre.pl sample_run.sh
 SIMULATOR_INTERFACE = csapp.h csapp.c scanner.h scanner.l gdb_protocol.h gdb_protocol.c arm_simulator_interface.h arm_simulator_interface.c
 ARM_runner_example_SOURCES = $(COMMON) $(SIMULATOR_INTERFACE) ARM_runner_example.c
 readelf_SOURCES = $(COMMON) $(readelf) Myreadelf/readelf.c
+myld_SOURCES = $(COMMON) $(myld) Myreadelf/myld.c
 all: all-recursive
 
 .SUFFIXES:
@@ -442,6 +454,10 @@ ARM_runner_example$(EXEEXT): $(ARM_runner_example_OBJECTS) $(ARM_runner_example_
 	@rm -f ARM_runner_example$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(ARM_runner_example_OBJECTS) $(ARM_runner_example_LDADD) $(LIBS)
 
+myld$(EXEEXT): $(myld_OBJECTS) $(myld_DEPENDENCIES) $(EXTRA_myld_DEPENDENCIES) 
+	@rm -f myld$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(myld_OBJECTS) $(myld_LDADD) $(LIBS)
+
 readelf$(EXEEXT): $(readelf_OBJECTS) $(readelf_DEPENDENCIES) $(EXTRA_readelf_DEPENDENCIES) 
 	@rm -f readelf$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(readelf_OBJECTS) $(readelf_LDADD) $(LIBS)
@@ -458,11 +474,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arm_simulator_interface.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/csapp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debug.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fusion.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gdb_protocol.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/myld.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/print_content_section.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/print_symbole.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/printhead.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readelf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reloc_table.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scanner.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/section_header.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/util.Po@am__quote@
@@ -564,6 +583,48 @@ print_symbole.obj: Myreadelf/print_symbole.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Myreadelf/print_symbole.c' object='print_symbole.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o print_symbole.obj `if test -f 'Myreadelf/print_symbole.c'; then $(CYGPATH_W) 'Myreadelf/print_symbole.c'; else $(CYGPATH_W) '$(srcdir)/Myreadelf/print_symbole.c'; fi`
+
+reloc_table.o: Myreadelf/reloc_table.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT reloc_table.o -MD -MP -MF $(DEPDIR)/reloc_table.Tpo -c -o reloc_table.o `test -f 'Myreadelf/reloc_table.c' || echo '$(srcdir)/'`Myreadelf/reloc_table.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/reloc_table.Tpo $(DEPDIR)/reloc_table.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Myreadelf/reloc_table.c' object='reloc_table.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o reloc_table.o `test -f 'Myreadelf/reloc_table.c' || echo '$(srcdir)/'`Myreadelf/reloc_table.c
+
+reloc_table.obj: Myreadelf/reloc_table.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT reloc_table.obj -MD -MP -MF $(DEPDIR)/reloc_table.Tpo -c -o reloc_table.obj `if test -f 'Myreadelf/reloc_table.c'; then $(CYGPATH_W) 'Myreadelf/reloc_table.c'; else $(CYGPATH_W) '$(srcdir)/Myreadelf/reloc_table.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/reloc_table.Tpo $(DEPDIR)/reloc_table.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Myreadelf/reloc_table.c' object='reloc_table.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o reloc_table.obj `if test -f 'Myreadelf/reloc_table.c'; then $(CYGPATH_W) 'Myreadelf/reloc_table.c'; else $(CYGPATH_W) '$(srcdir)/Myreadelf/reloc_table.c'; fi`
+
+fusion.o: Myreadelf/fusion.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fusion.o -MD -MP -MF $(DEPDIR)/fusion.Tpo -c -o fusion.o `test -f 'Myreadelf/fusion.c' || echo '$(srcdir)/'`Myreadelf/fusion.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fusion.Tpo $(DEPDIR)/fusion.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Myreadelf/fusion.c' object='fusion.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fusion.o `test -f 'Myreadelf/fusion.c' || echo '$(srcdir)/'`Myreadelf/fusion.c
+
+fusion.obj: Myreadelf/fusion.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fusion.obj -MD -MP -MF $(DEPDIR)/fusion.Tpo -c -o fusion.obj `if test -f 'Myreadelf/fusion.c'; then $(CYGPATH_W) 'Myreadelf/fusion.c'; else $(CYGPATH_W) '$(srcdir)/Myreadelf/fusion.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/fusion.Tpo $(DEPDIR)/fusion.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Myreadelf/fusion.c' object='fusion.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fusion.obj `if test -f 'Myreadelf/fusion.c'; then $(CYGPATH_W) 'Myreadelf/fusion.c'; else $(CYGPATH_W) '$(srcdir)/Myreadelf/fusion.c'; fi`
+
+myld.o: Myreadelf/myld.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT myld.o -MD -MP -MF $(DEPDIR)/myld.Tpo -c -o myld.o `test -f 'Myreadelf/myld.c' || echo '$(srcdir)/'`Myreadelf/myld.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/myld.Tpo $(DEPDIR)/myld.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Myreadelf/myld.c' object='myld.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o myld.o `test -f 'Myreadelf/myld.c' || echo '$(srcdir)/'`Myreadelf/myld.c
+
+myld.obj: Myreadelf/myld.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT myld.obj -MD -MP -MF $(DEPDIR)/myld.Tpo -c -o myld.obj `if test -f 'Myreadelf/myld.c'; then $(CYGPATH_W) 'Myreadelf/myld.c'; else $(CYGPATH_W) '$(srcdir)/Myreadelf/myld.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/myld.Tpo $(DEPDIR)/myld.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Myreadelf/myld.c' object='myld.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o myld.obj `if test -f 'Myreadelf/myld.c'; then $(CYGPATH_W) 'Myreadelf/myld.c'; else $(CYGPATH_W) '$(srcdir)/Myreadelf/myld.c'; fi`
 
 readelf.o: Myreadelf/readelf.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT readelf.o -MD -MP -MF $(DEPDIR)/readelf.Tpo -c -o readelf.o `test -f 'Myreadelf/readelf.c' || echo '$(srcdir)/'`Myreadelf/readelf.c
