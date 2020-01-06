@@ -145,3 +145,30 @@ void modification_indx_sections(Donnees * d){
  //    }
 }
 
+
+void ecriture_entete(Elf32_Ehdr* elf_head, FILE* file, Donnees* d){
+
+	elf_head->e_shoff = d->offset;
+	elf_head->e_shnum = d->nbS1;
+	size_t nmemb;
+
+	debug("Il y a %u sections dans le nouveau fichier ELF créé.\n", elf_head->e_shnum);
+	fseek(file, 0, SEEK_SET);
+	nmemb = fwrite(elf_head->e_ident,   EI_NIDENT,   1, file); assert(nmemb == 1);
+	nmemb = fwrite(&elf_head->e_type, sizeof(elf_head->e_type), 1, file); assert(nmemb == 1);
+	nmemb = fwrite(&elf_head->e_machine, sizeof(elf_head->e_machine), 1, file); assert(nmemb == 1);
+	nmemb = fwrite(&elf_head->e_version,   sizeof(elf_head->e_version), 1, file); assert(nmemb == 1);
+	nmemb = fwrite(&elf_head->e_entry,     sizeof(elf_head->e_entry), 1, file); assert(nmemb == 1);
+	nmemb = fwrite(&elf_head->e_phoff,     sizeof(elf_head->e_phoff), 1,file); assert(nmemb == 1);
+	nmemb = fwrite(&elf_head->e_shoff,     sizeof(elf_head->e_shoff), 1, file); assert(nmemb == 1);
+	nmemb = fwrite(&elf_head->e_flags,     sizeof(elf_head->e_flags), 1, file); assert(nmemb == 1);
+	nmemb = fwrite(&elf_head->e_ehsize,    sizeof(elf_head->e_ehsize), 1, file); assert(nmemb == 1);
+	nmemb = fwrite(&elf_head->e_phentsize, sizeof(elf_head->e_phentsize), 1, file); assert(nmemb == 1);
+	nmemb = fwrite(&elf_head->e_phnum,     sizeof(elf_head->e_phnum), 1, file); assert(nmemb == 1);
+	nmemb = fwrite(&elf_head->e_shentsize, sizeof(elf_head->e_shentsize), 1, file); assert(nmemb == 1);
+	nmemb = fwrite(&elf_head->e_shnum,     sizeof(elf_head->e_shnum), 1, file); assert(nmemb == 1);
+	nmemb = fwrite(&elf_head->e_shstrndx,  sizeof(elf_head->e_shstrndx), 1, file); assert(nmemb == 1);
+
+}
+
+
