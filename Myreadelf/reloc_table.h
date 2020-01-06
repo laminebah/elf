@@ -1,3 +1,5 @@
+#ifndef _H_RELOC
+#define _H_RELOC
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,3 +23,4 @@ void affiche_Relocation(Elf32_Shdr*Sec, Elf32_Ehdr h, Elf32_Sym *Sym, unsigned c
 
 char* SymName(Elf32_Shdr *Sec, int index, int indexStrTab, FILE *file);
 
+#endif

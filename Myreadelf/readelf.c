@@ -17,6 +17,7 @@
 #include "Elf_symbole.h"
 #include "print_symbole.h"
 #include "reloc_table.h"
+
 #define A  0 //toutes les commandes
 #define H  1 //entete
 #define X  2 //une section avec numéro ou name
