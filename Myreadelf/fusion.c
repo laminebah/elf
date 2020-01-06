@@ -52,51 +52,54 @@ int is_in(char * nameS,Elf32_Ehdr* h, Elf32_Shdr* t, FILE* f){
 
 void fusion_section1_in_section2(Donnees* d,FILE * file_in1, FILE* file_in2, Elf32_Ehdr* h1 ,Elf32_Ehdr* h2, Elf32_Word type){
 	int idx;
-	for (int i = 0; i < d->nbS1; ++i){
+	for (int i = 1; i < d->nbS1; ++i){
 		if(d->sh1[i].sh_type == type){
 			if(((idx=is_in(get_section_name(h1, d->sh1, i, file_in1), h2 , d->sh2, file_in2)) != -1) && d->f[i].newsh == NULL){
 					 d->f[i].newsh = malloc(sizeof(Elf32_Shdr)*2);
 					 assert(d->f[i].newsh != NULL);
 
-					 if (d->offset == 0)
-					 {	d->offset = d->sh1[i].sh_offset;}
+					//  if (d->offset == 0)
+					//  {	d->offset = d->sh1[i].sh_offset;}
 
 						 memcpy(&d->f[i].newsh[0],&d->sh1[i], sizeof(Elf32_Shdr));
 						 memcpy(&d->f[i].newsh[1],&d->sh2[idx], sizeof(Elf32_Shdr));
 						 d->f[i].nbS = 2;
 						 d->f[i].type = type;
 
-						 /* modificaion du size global des deux sections a fusionnees */
-						 d->f[i].size = d->sh1[i].sh_size + d->sh2[idx].sh_size;
-
-						 /*modificaion des offsets des deux sections a fusionnees*/
-						 d->f[i].newsh[0].sh_offset = d->offset;
+					
+						/*modificaion des offsets des deux sections a fusionnees*/
+						 d->offset = d->f[i].newsh[0].sh_offset;
 						 d->f[i].newsh[1].sh_offset = d->f[i].newsh[0].sh_offset + d->f[i].newsh[0].sh_size;
-				}else{
-					if (d->f[i].newsh == NULL){
-						d->f[i].newsh = malloc(sizeof(Elf32_Shdr)*1);
-				 		assert(d->f[i].newsh != NULL);
-				 		memcpy(&d->f[i].newsh[0], &d->sh1[i],  sizeof(Elf32_Shdr));
-				 		d->f[i].type = type;
-				 		d->f[i].nbS = 1;
 
-				 		/* modificaion du size global */
-				 		d->f[i].size = d->sh1[i].sh_size;
+						/* modificaion du size global des deux sections a fusionnees */
+						//d->f[i].size = d->sh1[i].sh_size + d->sh2[idx].sh_size;
+						d->f[i].size = d->f[i].newsh[0].sh_size +  d->f[i].newsh[1].sh_size;
 
-				 		/*modificaion d'offset d'une section n'existe pas dans le deuxieme fichier  */
-				 		d->f[i].newsh[0].sh_offset = d->offset;
-				 		
-					}
+			}else{
+				if (d->f[i].newsh == NULL){
+					d->f[i].newsh = malloc(sizeof(Elf32_Shdr)*1);
+					assert(d->f[i].newsh != NULL);
+					memcpy(&d->f[i].newsh[0], &d->sh1[i],  sizeof(Elf32_Shdr));
+					d->f[i].type = type;
+					d->f[i].nbS = 1;
+
+					/* modificaion du size global */
+					d->f[i].size = d->sh1[i].sh_size;
+
+					/*modificaion d'offset d'une section n'existe pas dans le deuxieme fichier  */
+					d->f[i].newsh[0].sh_offset = d->offset;
+					
+				}
 			}
 
 			/* modification des offsets globals  */
 			d->f[i].offset = d->f[i].newsh[0].sh_offset;
-			d->offset += d->f[i].size; 
+			d->offset = d->f[i].offset + d->f[i].size; 
 		}
 	}
 }
 void fusion_section2_in_section1(Donnees* d,FILE * file_in1, FILE* file_in2, Elf32_Ehdr* h1 ,Elf32_Ehdr* h2, Elf32_Word type){
-	for (int i = 0; i < d->nbS2; ++i){
+	for (int i = 1; i < d->nbS2; ++i){
 		if(d->sh2[i].sh_type == type){
 				if(is_in(get_section_name(h2, d->sh2, i, file_in2), h1 , d->sh1, file_in1) == -1 ){
 					d->nbS1++;
@@ -119,9 +122,21 @@ void fusion_section2_in_section1(Donnees* d,FILE * file_in1, FILE* file_in2, Elf
 	}
 }
 void fusion_by_type(Donnees* d,FILE * file_in1, FILE* file_in2, Elf32_Ehdr* h1 ,Elf32_Ehdr* h2, Elf32_Word type){
+	// if(type == SHT_NULL){
+	// 	d->f[0].newsh = malloc(sizeof(Elf32_Shdr)*1);
+	// 	assert(d->f[0].newsh != NULL);
+	// 	memcpy(&d->f[0].newsh[0], &d->sh1[0],  sizeof(Elf32_Shdr));
+	// 	d->f[0].type = type;
+	// 	d->f[0].nbS = 1;
+	// 	d->f[0].size = 0;
+	// 	d->f[0].offset = 0;
+
+	// }
 	fusion_section1_in_section2(d,file_in1,file_in2, h1 ,h2, type);
     fusion_section2_in_section1(d,file_in1,file_in2,  h1 ,h2, type);
 }
+
+
 
 void modification_indx_sections(Donnees * d){
 	// for (int i = 1; i < d->nbS1; ++i){
