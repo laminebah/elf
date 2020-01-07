@@ -62,14 +62,17 @@ int main (int argc, char** argv){
 
     init_fusion(d, sections_table1, elf_head1,  sections_table2, elf_head2);
 
-    /* fusion PROGBITS , REL */
+    /* fusion PROGBITS , REL,  ...*/
     fusion_by_type(d,file_in1,file_in2, elf_head1 ,elf_head2,SHT_NULL);
     fusion_by_type(d,file_in1,file_in2, elf_head1 ,elf_head2,SHT_PROGBITS);
     fusion_by_type(d,file_in1,file_in2, elf_head1 ,elf_head2,SHT_NOBITS);
     fusion_by_type(d,file_in1,file_in2, elf_head1 ,elf_head2,SHT_REL);
+    fusion_by_type(d,file_in1,file_in2, elf_head1 ,elf_head2,SHT_RELA);
     fusion_by_type(d,file_in1,file_in2, elf_head1 ,elf_head2,SHT_SYMTAB);
     fusion_by_type(d,file_in1,file_in2, elf_head1 ,elf_head2,SHT_STRTAB);
     fusion_by_type(d,file_in1,file_in2, elf_head1 ,elf_head2,SHT_ARM_ATTRIBUTES);
+
+    modification_indx_sections(d);
 
 
     /* example d'affichage des offsets */
@@ -86,10 +89,14 @@ int main (int argc, char** argv){
     for (int i = 0; i < d->nbS1; ++i){
        if(d->f[i].name != NULL) {
           printf("************* section %d ***************\n",i);
-          printf("%s\n",d->f[i].name);
+          printf("%d\n",d->f[i].sh_link);
+          printf("%d\n",d->f[i].sh_info);
           printf("*****************************\n");
-       }
+        }else {
+          printf("i= %d\n",i );
+        }
     }
+
 
 
 
