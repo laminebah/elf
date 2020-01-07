@@ -27,10 +27,14 @@ void init_fusion(Donnees* d, Elf32_Shdr* sections_table1, Elf32_Ehdr* header1, E
 	d->nbS2 = 0;
 	d->offset = 0;
 	d->o_ecris = 1;
+
 	d->sh1 = init_sections(d->sh1,&d->nbS1,sections_table1, header1);
 	d->sh2 = init_sections(d->sh2,&d->nbS2,sections_table2, header2);
 	d->f = (Donnees_fusion *) malloc(sizeof(Donnees_fusion) * d->nbS1);
 	assert(d->f!=NULL);
+	for (int i = 0; i < d->nbS1; ++i){
+		d->f[i].type = -1;
+	}
 
 }
 
@@ -122,18 +126,19 @@ void fusion_section2_in_section1(Donnees* d,FILE * file_in1, FILE* file_in2, Elf
 	}
 }
 void fusion_by_type(Donnees* d,FILE * file_in1, FILE* file_in2, Elf32_Ehdr* h1 ,Elf32_Ehdr* h2, Elf32_Word type){
-	// if(type == SHT_NULL){
-	// 	d->f[0].newsh = malloc(sizeof(Elf32_Shdr)*1);
-	// 	assert(d->f[0].newsh != NULL);
-	// 	memcpy(&d->f[0].newsh[0], &d->sh1[0],  sizeof(Elf32_Shdr));
-	// 	d->f[0].type = type;
-	// 	d->f[0].nbS = 1;
-	// 	d->f[0].size = 0;
-	// 	d->f[0].offset = 0;
+	if(type == SHT_NULL){
+		d->f[0].newsh = malloc(sizeof(Elf32_Shdr)*1);
+		assert(d->f[0].newsh != NULL);
+		memcpy(&d->f[0].newsh[0], &d->sh1[0],  sizeof(Elf32_Shdr));
+		d->f[0].type = type;
+		d->f[0].nbS = 1;
+		d->f[0].size = 0;
+		d->f[0].offset = 0;
+	}else{
+			fusion_section1_in_section2(d,file_in1,file_in2, h1 ,h2, type);
+    		fusion_section2_in_section1(d,file_in1,file_in2,  h1 ,h2, type);
+	}
 
-	// }
-	fusion_section1_in_section2(d,file_in1,file_in2, h1 ,h2, type);
-    fusion_section2_in_section1(d,file_in1,file_in2,  h1 ,h2, type);
 }
 
 
@@ -152,7 +157,7 @@ void ecriture_entete(Elf32_Ehdr* elf_head, FILE* file, Donnees* d){
 	elf_head->e_shnum = d->nbS1;
 	size_t nmemb;
 
-	debug("Il y a %u sections dans le nouveau fichier ELF créé.\n", elf_head->e_shnum);
+	//debug("Il y a %u sections dans le nouveau fichier ELF créé.\n", elf_head->e_shnum);
 	fseek(file, 0, SEEK_SET);
 	nmemb = fwrite(elf_head->e_ident,   EI_NIDENT,   1, file); assert(nmemb == 1);
 	nmemb = fwrite(&elf_head->e_type, sizeof(elf_head->e_type), 1, file); assert(nmemb == 1);
