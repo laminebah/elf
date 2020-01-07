@@ -212,7 +212,7 @@ void modification_indx_sections(Donnees * d){
 							d->f[i].sh_link  = get_index_section(d,".symtab");
 						break;
 					default:
-						printf("type non traite\n");
+						break;
 
 				}
     }
