@@ -9,6 +9,9 @@ typedef struct {
     Elf32_Word type;
     Elf32_Word size;                      
 	Elf32_Off offset;
+	Elf32_Word	sh_link;
+    Elf32_Word	sh_info;
+    char* name;
 	int nbS;
 }Donnees_fusion; //contient les section a fusionnees
 
