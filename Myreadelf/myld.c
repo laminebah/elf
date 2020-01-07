@@ -88,9 +88,7 @@ int main (int argc, char** argv){
           printf("************* section %d ***************\n",i);
           printf("%s\n",d->f[i].name);
           printf("*****************************\n");
-        }else {
-          printf("i= %d\n",i );
-        }
+       }
     }
 
 
