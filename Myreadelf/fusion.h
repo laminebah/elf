@@ -66,4 +66,12 @@ void fusion_section2_in_section1(Donnees* d,FILE * file_in1, FILE* file_in2, Elf
  * Résultat : Elle ne renvoie rien mais modifie la structure Données
  *  * */
 void fusion_by_type(Donnees* d,FILE * file_in1, FILE* file_in2, Elf32_Ehdr* h1 ,Elf32_Ehdr* h2, Elf32_Word type);
+
+
+
+char* split_name(char * name);
+int get_index_section(Donnees * d , char* name);
+void modification_indx_sections(Donnees * d);
+void ecriture_entete(Elf32_Ehdr* elf_head, FILE* file, Donnees* d);
+
 #endif
