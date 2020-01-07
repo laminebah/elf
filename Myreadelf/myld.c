@@ -63,29 +63,32 @@ int main (int argc, char** argv){
     init_fusion(d, sections_table1, elf_head1,  sections_table2, elf_head2);
 
     /* fusion PROGBITS , REL */
+    fusion_by_type(d,file_in1,file_in2, elf_head1 ,elf_head2,SHT_NULL);
     fusion_by_type(d,file_in1,file_in2, elf_head1 ,elf_head2,SHT_PROGBITS);
+    fusion_by_type(d,file_in1,file_in2, elf_head1 ,elf_head2,SHT_NOBITS);
     fusion_by_type(d,file_in1,file_in2, elf_head1 ,elf_head2,SHT_REL);
 
 
     /* example d'affichage des offsets */
     for (int i = 0; i < d->nbS1; ++i){
-  		 if((d->f[i].type== SHT_PROGBITS)||(d->f[i].type== SHT_REL)) {
-  			printf("*****************************\n");
-				printf("section%d : %06x\n",i,d->f[i].newsh[0].sh_offset);
+  		 if((d->f[i].type== SHT_NULL)||(d->f[i].type== SHT_NOBITS)||(d->f[i].type== SHT_PROGBITS)||(d->f[i].type== SHT_REL)) {
+  			printf("************* section %d ***************\n",i);
+				printf("%06x\n",d->f[i].newsh[0].sh_offset);
      	    if(d->f[i].nbS==2)
-				printf("section%d : %06x\n",i,d->f[i].newsh[1].sh_offset);
-			printf("*****************************\n");
+				      {printf("%06x\n",d->f[i].newsh[1].sh_offset);}
+			  printf("*****************************\n");
      	}	
     }
 
 
 
-    freemem (elf_head1);
-    freemem (elf_head2);
+  freemem (elf_head1);
+  freemem (elf_head2);
 	freemem (sections_table1);
 	freemem (sections_table2);
 	fclose (file_in1);
 	fclose (file_in2);
+  fclose (file_out);
 	freemem(d->sh1);
 	freemem(d->sh2);
 	for (int i = 0; i < d->nbS1; ++i){
@@ -97,4 +100,5 @@ int main (int argc, char** argv){
 
     return EXIT_SUCCESS;
 }
+
 
