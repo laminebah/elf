@@ -245,3 +245,46 @@ void ecriture_entete(Elf32_Ehdr* elf_head, FILE* file, Donnees* d){
 }
 
 
+void ecriture_section_table(Elf32_Ehdr* elf_head, FILE* file, Donnees* d){
+	Elf32_Off offset = 0;
+	
+	//int ind = 0;
+	//Elf32_Off written = 0;
+	
+
+	
+	// for(ind = 0; strcmp(d->f[ind].name, ".shstrtab")  ; ind++);
+	// elf_head->e_shstrndx = ind;
+	
+	// // printf("Écriture de la table des noms de section dans le fichier à l'offset %#x\n", d->f[ind].offset);
+	// fseek(file, d->f[ind].offset, SEEK_SET);
+	// for(int i = 0; i < d->nbS1; i++)
+	// {	
+	// 		d->f[i].newsh->sh_name = written;
+	// 		printf("%u\n", d->f[i].newsh->sh_name);
+	// 		written += fwrite(d->f[i].name, 1, strlen(d->f[i].name) + 1, file);
+	// }
+	// d->f[ind].newsh[0].sh_size = written;
+
+	//debug("Il y a %d en-têtes de section, débutant à l'adresse de décalage 0x%x dans le nouveau fichier créé:\n\n",elf_head->e_shnum, elf_head->e_shoff);
+	fseek(file, elf_head->e_shoff, SEEK_SET);
+	for(int i = 0; i < d->nbS1; i++)
+	{
+		//debug("Écriture de l'en-tête de section n°%2i  dans le fichier à l'offset %#x ", i, d->offset + i * elf_head->e_shentsize);
+		fseek(file, d->offset + i * elf_head->e_shentsize, SEEK_SET);
+
+		offset += fwrite(&d->sh1[i].sh_name,      sizeof(d->sh1[i].sh_name), 1, file);
+		offset += fwrite(&d->sh1[i].sh_type,      sizeof(d->sh1[i].sh_type), 1, file);
+		offset += fwrite(&d->sh1[i].sh_flags,     sizeof(d->sh1[i].sh_flags), 1, file);
+		offset += fwrite(&d->sh1[i].sh_addr,      sizeof(d->sh1[i].sh_addr), 1, file);
+		offset += fwrite(&d->sh1[i].sh_offset,    sizeof(d->sh1[i].sh_offset), 1, file);
+		offset += fwrite(&d->sh1[i].sh_size,      sizeof(d->sh1[i].sh_size), 1, file);
+		offset += fwrite(&d->sh1[i].sh_link,      sizeof(d->sh1[i].sh_link), 1, file);
+		offset += fwrite(&d->sh1[i].sh_info,      sizeof(d->sh1[i].sh_info), 1, file);
+		offset += fwrite(&d->sh1[i].sh_addralign, sizeof(d->sh1[i].sh_addralign), 1, file);
+		offset += fwrite(&d->sh1[i].sh_entsize,   sizeof(d->sh1[i].sh_entsize), 1, file);
+	}
+	d->offset = offset;
+}
+
+
