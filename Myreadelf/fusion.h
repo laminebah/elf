@@ -90,9 +90,16 @@ int get_index_section(Donnees * d , char* name);
 void modification_indx_sections(Donnees * d);
 
 /**Cette fonction permet l'ecriture de l'entete
- * Données : l'entete ELF , un stream ouvert en "w", Une structure  
+ * Données : l'entete ELF , un stream ouvert en "w", Une structure  Données 
  * Résultat : Elle ne renvoie rien
  *  * */
 void ecriture_entete(Elf32_Ehdr* elf_head, FILE* file, Donnees* d);
+
+
+/**Cette fonction permet l'ecriture de la table des sections 
+ * Données : l'entete ELF , un stream ouvert en "w", la structure  Données
+ * Résultat : Elle ne renvoie rien
+ *  * */
+void ecriture_section_table(Elf32_Ehdr* elf_head, FILE* file, Donnees* d);
 
 #endif
