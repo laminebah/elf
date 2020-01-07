@@ -22,6 +22,7 @@ typedef struct {
 	Elf32_Off offset;
 	int o_ecris;
 } Donnees;
+
 //libère de la mémoire
 void freemem(void *adr);
 
@@ -61,17 +62,37 @@ void fusion_section1_in_section2(Donnees* d,FILE * file_in1, FILE* file_in2, Elf
  * Résultat : elle ne renvoie rien mais modifie la structure Données
  * */
 void fusion_section2_in_section1(Donnees* d,FILE * file_in1, FILE* file_in2, Elf32_Ehdr* h1 ,Elf32_Ehdr* h2, Elf32_Word type);
+
+
 /**Cette fonction fait une fusion par type en appelant les deux autres fonctions de fusion
- * Données : Une structure Données,deux streams ouverts en r,deux entêtes elf et un type
+ * Données : Une structure Données,deux streams ouverts en "r",deux entêtes elf et un type
  * Résultat : Elle ne renvoie rien mais modifie la structure Données
  *  * */
 void fusion_by_type(Donnees* d,FILE * file_in1, FILE* file_in2, Elf32_Ehdr* h1 ,Elf32_Ehdr* h2, Elf32_Word type);
 
 
-
+/**Cette fonction permet de diviser le nom d'une section de type REL ou RAL aprtir du deuxieme point 
+ * Données : Une chaine de caractere 
+ * Résultat : Une chaine de caractere 
+ *  * */
 char* split_name(char * name);
+
+/**Cette fonction permet de retourner l'indice d'une section dans la structure Données a travers son nom
+ * Données : Une structure Données, nom de section 
+ * Résultat : Elle renvoie un indice de section 
+ *  * */
 int get_index_section(Donnees * d , char* name);
+
+/**Cette fonction permet la mise a jour  des attributs sh_link et sh_info des sections de la structure Données
+ * Données : Une structure  
+ * Résultat : Elle ne renvoie rien mais modifie la structure Données
+ *  * */
 void modification_indx_sections(Donnees * d);
+
+/**Cette fonction permet l'ecriture de l'entete
+ * Données : l'entete ELF , un stream ouvert en "w", Une structure  
+ * Résultat : Elle ne renvoie rien
+ *  * */
 void ecriture_entete(Elf32_Ehdr* elf_head, FILE* file, Donnees* d);
 
 #endif
