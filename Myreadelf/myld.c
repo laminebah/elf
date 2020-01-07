@@ -67,17 +67,30 @@ int main (int argc, char** argv){
     fusion_by_type(d,file_in1,file_in2, elf_head1 ,elf_head2,SHT_PROGBITS);
     fusion_by_type(d,file_in1,file_in2, elf_head1 ,elf_head2,SHT_NOBITS);
     fusion_by_type(d,file_in1,file_in2, elf_head1 ,elf_head2,SHT_REL);
+    fusion_by_type(d,file_in1,file_in2, elf_head1 ,elf_head2,SHT_SYMTAB);
+    fusion_by_type(d,file_in1,file_in2, elf_head1 ,elf_head2,SHT_STRTAB);
+    fusion_by_type(d,file_in1,file_in2, elf_head1 ,elf_head2,SHT_ARM_ATTRIBUTES);
 
 
     /* example d'affichage des offsets */
+    // for (int i = 0; i < d->nbS1; ++i){
+  		//  if((d->f[i].type== SHT_NULL)||(d->f[i].type== SHT_NOBITS)||(d->f[i].type== SHT_PROGBITS)||(d->f[i].type== SHT_REL)) {
+  		// 	printf("************* section %d ***************\n",i);
+				// printf("%06x\n",d->f[i].newsh[0].sh_offset);
+    //  	    if(d->f[i].nbS==2)
+				//       {printf("%06x\n",d->f[i].newsh[1].sh_offset);}
+			 //  printf("*****************************\n");
+    //  	}	
+    // }
+
     for (int i = 0; i < d->nbS1; ++i){
-  		 if((d->f[i].type== SHT_NULL)||(d->f[i].type== SHT_NOBITS)||(d->f[i].type== SHT_PROGBITS)||(d->f[i].type== SHT_REL)) {
-  			printf("************* section %d ***************\n",i);
-				printf("%06x\n",d->f[i].newsh[0].sh_offset);
-     	    if(d->f[i].nbS==2)
-				      {printf("%06x\n",d->f[i].newsh[1].sh_offset);}
-			  printf("*****************************\n");
-     	}	
+       if(d->f[i].name != NULL) {
+          printf("************* section %d ***************\n",i);
+          printf("%s\n",d->f[i].name);
+          printf("*****************************\n");
+        }else {
+          printf("i= %d\n",i );
+        }
     }
 
 
@@ -100,5 +113,4 @@ int main (int argc, char** argv){
 
     return EXIT_SUCCESS;
 }
-
 
