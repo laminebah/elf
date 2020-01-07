@@ -59,11 +59,8 @@ void fusion_section1_in_section2(Donnees* d,FILE * file_in1, FILE* file_in2, Elf
 	for (int i = 1; i < d->nbS1; ++i){
 		if(d->sh1[i].sh_type == type){
 			if(((idx=is_in(get_section_name(h1, d->sh1, i, file_in1), h2 , d->sh2, file_in2)) != -1) && d->f[i].newsh == NULL){
-					 d->f[i].newsh = malloc(sizeof(Elf32_Shdr)*2);
-					 assert(d->f[i].newsh != NULL);
-
-					//  if (d->offset == 0)
-					//  {	d->offset = d->sh1[i].sh_offset;}
+						 d->f[i].newsh = malloc(sizeof(Elf32_Shdr)*2);
+						 assert(d->f[i].newsh != NULL);
 
 						 memcpy(&d->f[i].newsh[0],&d->sh1[i], sizeof(Elf32_Shdr));
 						 memcpy(&d->f[i].newsh[1],&d->sh2[idx], sizeof(Elf32_Shdr));
@@ -76,7 +73,6 @@ void fusion_section1_in_section2(Donnees* d,FILE * file_in1, FILE* file_in2, Elf
 						 d->f[i].newsh[1].sh_offset = d->f[i].newsh[0].sh_offset + d->f[i].newsh[0].sh_size;
 
 						/* modificaion du size global des deux sections a fusionnees */
-						//d->f[i].size = d->sh1[i].sh_size + d->sh2[idx].sh_size;
 						d->f[i].size = d->f[i].newsh[0].sh_size +  d->f[i].newsh[1].sh_size;
 
 			}else{
