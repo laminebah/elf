@@ -92,8 +92,6 @@ int main (int argc, char** argv){
           printf("%d\n",d->f[i].sh_link);
           printf("%d\n",d->f[i].sh_info);
           printf("*****************************\n");
-        }else {
-          printf("i= %d\n",i );
         }
     }
 
