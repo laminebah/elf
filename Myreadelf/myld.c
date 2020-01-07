@@ -87,12 +87,10 @@ int main (int argc, char** argv){
     // }
 
     for (int i = 0; i < d->nbS1; ++i){
-       if(d->f[i].name != NULL) {
           printf("************* section %d ***************\n",i);
           printf("%d\n",d->f[i].sh_link);
           printf("%d\n",d->f[i].sh_info);
           printf("*****************************\n");
-        }
     }
 
 
