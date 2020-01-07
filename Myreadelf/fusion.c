@@ -34,12 +34,15 @@ void init_fusion(Donnees* d, Elf32_Shdr* sections_table1, Elf32_Ehdr* header1, E
 	assert(d->f!=NULL);
 	for (int i = 0; i < d->nbS1; ++i){
 		d->f[i].type = -1;
+		d->f[i].sh_link = 0;
+		d->f[i].sh_info = 0;
 	}
 
 }
 
 char* get_section_name(Elf32_Ehdr* header, Elf32_Shdr* sections_table, int idx, FILE* fichier){
 	char *name = malloc(SIZENAME*sizeof(char));
+	assert (name!= NULL);
 	fseek(fichier, sections_table[header->e_shstrndx].sh_offset + sections_table[idx].sh_name, SEEK_SET);
 	char *s=fgets(name, SIZENAME, fichier);
 	assert (s != NULL);
@@ -59,14 +62,16 @@ void fusion_section1_in_section2(Donnees* d,FILE * file_in1, FILE* file_in2, Elf
 	for (int i = 1; i < d->nbS1; ++i){
 		if(d->sh1[i].sh_type == type){
 			if(((idx=is_in(get_section_name(h1, d->sh1, i, file_in1), h2 , d->sh2, file_in2)) != -1) && d->f[i].newsh == NULL){
-						 d->f[i].newsh = malloc(sizeof(Elf32_Shdr)*2);
-						 assert(d->f[i].newsh != NULL);
+					 d->f[i].newsh = malloc(sizeof(Elf32_Shdr)*2);
+					 assert(d->f[i].newsh != NULL);
 
 						 memcpy(&d->f[i].newsh[0],&d->sh1[i], sizeof(Elf32_Shdr));
 						 memcpy(&d->f[i].newsh[1],&d->sh2[idx], sizeof(Elf32_Shdr));
 						 d->f[i].nbS = 2;
 						 d->f[i].type = type;
 
+						 /* copie le nom de la section */
+						 d->f[i].name = get_section_name(h1, d->sh1, i, file_in1);
 					
 						/*modificaion des offsets des deux sections a fusionnees*/
 						 d->offset = d->f[i].newsh[0].sh_offset;
@@ -82,6 +87,9 @@ void fusion_section1_in_section2(Donnees* d,FILE * file_in1, FILE* file_in2, Elf
 					memcpy(&d->f[i].newsh[0], &d->sh1[i],  sizeof(Elf32_Shdr));
 					d->f[i].type = type;
 					d->f[i].nbS = 1;
+
+					/* copie le nom de la section */
+					d->f[i].name = get_section_name(h1, d->sh1, i, file_in1);
 
 					/* modificaion du size global */
 					d->f[i].size = d->sh1[i].sh_size;
@@ -110,6 +118,9 @@ void fusion_section2_in_section1(Donnees* d,FILE * file_in1, FILE* file_in2, Elf
 					d->f[d->nbS1-1].type = type;
 					d->f[d->nbS1-1].nbS = 1;
 
+					/* copie le nom de la section */
+					d->f[d->nbS1-1].name = get_section_name(h2, d->sh2, i, file_in2);
+
 					/* modificaion du size global */
 					d->f[d->nbS1-1].size =  d->sh2[i].sh_size;
 
@@ -130,6 +141,8 @@ void fusion_by_type(Donnees* d,FILE * file_in1, FILE* file_in2, Elf32_Ehdr* h1 ,
 		d->f[0].nbS = 1;
 		d->f[0].size = 0;
 		d->f[0].offset = 0;
+		/* copie le nom de la section */
+		d->f[0].name = get_section_name(h1, d->sh1, 0, file_in1);
 	}else{
 			fusion_section1_in_section2(d,file_in1,file_in2, h1 ,h2, type);
     		fusion_section2_in_section1(d,file_in1,file_in2,  h1 ,h2, type);
@@ -137,14 +150,45 @@ void fusion_by_type(Donnees* d,FILE * file_in1, FILE* file_in2, Elf32_Ehdr* h1 ,
 
 }
 
+// char* split_name(char * name ){
+//   char* ptr = NULL;
+//   int j=0;
+//   ptr = (char* ) malloc(sizeof(char) * (strlen(name) - 3));
+//   if (ptr == NULL)
+//       printf("erreur d'allocation pour ptr\n");
+//   for (int i = 0; i < strlen(name); ++i){
+//     if (i>3){
+//         ptr[j] = name[i];
+//         j++;
+//     }
+//   }
+//   return ptr;
+// }
 
+// int  exist_indx_section(Donnees * d, Elf32_Word type ){
+// 	for (int i = 0; i < d->nbS1; ++i)
+//   		 if(d->f[i].type == type) 
+//   		 		return i;
+// 	return 0;
+// }
 
-void modification_indx_sections(Donnees * d){
-	// for (int i = 1; i < d->nbS1; ++i){
- //    	   	d->f[i].newsh[0].sh_link = newsec[d->f[i].newsh[0].sh_link];
-	// 		d->f[i].newsh[0].sh_info = newsec[d->f[i].newsh[0].sh_info];
- //    }
-}
+// void modification_indx_sections(Donnees * d){
+
+// 	int indSYMTAB =  exist_indx_section(d,SHT_SYMTAB);
+// 	int indSTRTAB = exist_indx_section(d,SHT_STRTAB); 
+
+// 	for (int i = 1; i < d->nbS1; ++i){
+// 		if (d->f[i].type == SHT_REL){
+// 			d->f[i].sh_link  = indSYMTAB;
+// 			//d->f[i].sh_info  = ;
+
+// 		}
+// 		if (d->f[i].type == SHT_SYMTAB){
+// 			d->f[i].sh_link  = indSTRTAB;
+// 			//d->f[i].sh_info = 
+// 		}
+//     }
+// }
 
 
 void ecriture_entete(Elf32_Ehdr* elf_head, FILE* file, Donnees* d){
