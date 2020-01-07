@@ -147,48 +147,76 @@ void fusion_by_type(Donnees* d,FILE * file_in1, FILE* file_in2, Elf32_Ehdr* h1 ,
 			fusion_section1_in_section2(d,file_in1,file_in2, h1 ,h2, type);
     		fusion_section2_in_section1(d,file_in1,file_in2,  h1 ,h2, type);
 	}
-
 }
 
-// char* split_name(char * name ){
-//   char* ptr = NULL;
-//   int j=0;
-//   ptr = (char* ) malloc(sizeof(char) * (strlen(name) - 3));
-//   if (ptr == NULL)
-//       printf("erreur d'allocation pour ptr\n");
-//   for (int i = 0; i < strlen(name); ++i){
-//     if (i>3){
-//         ptr[j] = name[i];
-//         j++;
-//     }
-//   }
-//   return ptr;
-// }
+char* split_name(char * name){
+  char* ptr = NULL;
+  int i=1,k=0;
+  ptr = (char* ) malloc(sizeof(char) * SIZENAME);
+  if (ptr == NULL)
+      printf("erreur d'allocation pour ptr\n");
 
-// int  exist_indx_section(Donnees * d, Elf32_Word type ){
-// 	for (int i = 0; i < d->nbS1; ++i)
-//   		 if(d->f[i].type == type) 
-//   		 		return i;
-// 	return 0;
-// }
+  while(name[i+1]!= '.'){
+    	i++;
+  }
+  for (int j = i+1; j < strlen(name); ++j){
+  		ptr[k] = name[j];
+  		k++;
+  }
+  ptr[k] = '\0';
+  return ptr;
+}
 
-// void modification_indx_sections(Donnees * d){
 
-// 	int indSYMTAB =  exist_indx_section(d,SHT_SYMTAB);
-// 	int indSTRTAB = exist_indx_section(d,SHT_STRTAB); 
+int get_index_section(Donnees * d , char* name){
+	int indx = -1;
+	for (int j = 0; j < d->nbS1; ++j){
+		if (strcmp( name , d->f[j].name) == 0)
+			indx = j;
+	}
+	return indx;
+}
 
-// 	for (int i = 1; i < d->nbS1; ++i){
-// 		if (d->f[i].type == SHT_REL){
-// 			d->f[i].sh_link  = indSYMTAB;
-// 			//d->f[i].sh_info  = ;
+void modification_indx_sections(Donnees * d){
+	for (int i = 1; i < d->nbS1; ++i){
+				switch(d->f[i].type){
+					case SHT_REL:
+							d->f[i].sh_link  = get_index_section(d,".symtab");
+							d->f[i].sh_info = get_index_section(d,split_name(d->f[i].name));
+						break;
 
-// 		}
-// 		if (d->f[i].type == SHT_SYMTAB){
-// 			d->f[i].sh_link  = indSTRTAB;
-// 			//d->f[i].sh_info = 
-// 		}
-//     }
-// }
+					case SHT_RELA:
+							d->f[i].sh_link  = get_index_section(d,".symtab");
+							d->f[i].sh_info = get_index_section(d,split_name(d->f[i].name));
+						break;
+
+					case SHT_SYMTAB:
+							d->f[i].sh_link  = get_index_section(d,".strtab");	
+							d->f[i].sh_info = get_index_section(d,".shstrtab");
+						break;
+
+					case SHT_DYNSYM:
+							d->f[i].sh_link  = get_index_section(d,".strtab");	
+							d->f[i].sh_info = get_index_section(d,".shstrtab");
+						break;
+
+					case SHT_HASH:
+							d->f[i].sh_link  = get_index_section(d,".symtab");
+						break;
+
+					case SHT_DYNAMIC:
+							d->f[i].sh_link  = get_index_section(d,".strtab");	
+						break;
+
+					case SHT_GROUP:
+							d->f[i].sh_link  = get_index_section(d,".symtab");
+						break;
+					default:
+						printf("type non traite\n");
+
+				}
+    }
+}
 
 
 void ecriture_entete(Elf32_Ehdr* elf_head, FILE* file, Donnees* d){
