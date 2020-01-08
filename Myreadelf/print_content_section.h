@@ -3,7 +3,7 @@
 #include <elf.h>
 #include <stdio.h>
 #include <ctype.h>
-#define N 16
+#define MAX 16
 #define SIZENAME 30
 
 							/*  gère l'affichage du contenu d'une section   */
@@ -32,10 +32,10 @@ void affiche_contentSection(unsigned char *, Elf32_Shdr*, Elf32_Ehdr*, FILE *, c
 
 
 /***	Cette fonction est utilsée par la fonction lire_contentsec  pour faire l`affichage en format hexa
-		Données : une addresse, un tampon et une taille
+		Données : une addresse, un tampon, taille et une longeur
 		Résultat: aucun
 ***/
-void hexdump(int,unsigned char[],int);
+int hexdump(int,unsigned char[],int , int );
 
 
 
@@ -53,6 +53,5 @@ void lire_contentsec(FILE *,int,int);
 		Résultat: chaine de caractére
 ***/
 unsigned char *print_content_section(char*, Elf32_Shdr*, Elf32_Ehdr*, FILE *, int);
-
 
 #endif
