@@ -36,11 +36,6 @@ Elf32_Shdr*  init_sections(Elf32_Shdr* sh, int* nbS, Elf32_Shdr* sections_table,
  * */
 void init_fusion(Donnees* d, Elf32_Shdr* sections_table1, Elf32_Ehdr* header1, Elf32_Shdr* sections_table2, Elf32_Ehdr* header2);
 
-/**Cette fonction récupère le nom d'une section par son indice
- * Données : l'entet elf,la table de section,l'indice idx puis un stream ouvert en lecture
- * -Résultat : un string qui est le nom de la section de l'indice idx
- * **/
-char* get_section_name(Elf32_Ehdr* header, Elf32_Shdr* sections_table, int idx, FILE* fichier);
 
 /**Cette fonction vérifie l'existence d'une section donnée par nom dans la table de section du fichier donné
  * Données : le nom de la section,une entete elf,une table de section et un fichier
