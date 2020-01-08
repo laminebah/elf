@@ -13,7 +13,7 @@ typedef struct {
     Elf32_Word	sh_info;
     char* name;
 	int nbS;
-}Donnees_fusion; //contient les sections a fusionnees
+}Donnees_fusion; /* contient les sections a fusionnees */
 
 typedef struct {
 	Elf32_Shdr* sh1, * sh2;
