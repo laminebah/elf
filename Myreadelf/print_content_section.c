@@ -26,7 +26,6 @@ char* get_section_name(Elf32_Ehdr* header, Elf32_Shdr* sections_table, int idx, 
 //chercher si la section existe  
 int existe_section(Elf32_Shdr* sectionHeader, Elf32_Ehdr* header, char * name, FILE* fichier){
 	int res = -1;
-	//int n;
 	if(name[0]==46){
 		for(int i=0;i< header->e_shnum;i++)
 			if(!strcmp(name,get_section_name( header, sectionHeader, i , fichier)))
@@ -34,105 +33,47 @@ int existe_section(Elf32_Shdr* sectionHeader, Elf32_Ehdr* header, char * name, F
 	} sscanf(name, "%d", &res);
 		return res;	
 }
-// //affiche le contenu d'un tampon en format hex 
-// void hexdump(int addr,unsigned char* tampon,int k){
-// 			int i;
-// 		    printf(" 0x%08x ",addr);
-// 	        addr+=16;
-// 	        for(i=0;i<sizeof(tam);i++){
-// 	            if(i<k){
-// 	                printf("%02x",tampon[i]);
-// 	            }
-// 	            else{
-// 	                printf("  ");
-// 	            }
-// 			    if((i+1)%4==0){
-// 				printf(" ");
-// 			    } 
-// 			}
-// 	    	for(i=0;i<N;i++){
-// 	            if(i<k){
-// 	      			printf("%c",isprint(tampon[i])?tampon[i]:'.');
-// 	            }
-// 	            else{
-// 	                printf(" ");
-// 	            }
-// 	    	}
-// 	    	printf("\n");
-// }
 
-// //lecture d`une chaine de caractére a partir d`une addresse donnée 
-// void lire_contentsec(FILE *fichier,int addr,int size){
-//   unsigned char tampon[N]; 
-//   int k;
-// 		while(size>sizeof(tampon)){
-// 	    	k=fread(tampon,1,sizeof(tampon),fichier);
-// 	    	assert(k == sizeof(tampon));
-// 	    	hexdump(addr,tampon,k);
-// 	    	size-=16;
-// 	  	}
-// 	  	k=fread(tampon,1,size,fichier);
-//     	assert(k == size);
-// 	   	hexdump(addr,tampon,k);
-// }
+//affiche le contenu d'un tampon en format hexa
+int hexdump(int addr,unsigned char* tampon,int size , int longeur){
+	for(int i=0;i<longeur;i++){
+	    if(i<size){
+	        printf("%02x",tampon[i]);
+	    }
+	    else{
+	        printf("  ");
+	    }
+	    if((i+1)%4==0){
+			printf(" ");
+	    } 
+	}
+	for(int i=0;i<longeur;i++){
+	    if(i<size){
+				printf("%c",isprint(tampon[i])?tampon[i]:'.');
+	    }else{
+	        printf("  ");
+	    }
+	}
+	printf("\n");
+	return size;
+}
 
 //afficher le contenu brute d'une section en hex 
 void lire_contentsec(FILE *fichier,int addr,int size){
-  unsigned char tampon[N]; 
-  int k,i;
-	  while(size>sizeof(tampon)){
+    unsigned char tampon[MAX]; 
+  	int k;
+	while(size>sizeof(tampon)){
 	    	k=fread(tampon,1,sizeof(tampon),fichier);
 	    	assert(k == sizeof(tampon));
 	        printf(" 0x%08x  ",addr);
 	        addr+=16;
-	        for(i=0;i<sizeof(tampon);i++){
-	            if(i<k){
-	                printf("%02x",tampon[i]);
-	            }
-	            else{
-	                printf("   ");
-	            }
-		    if((i+1)%4==0){
-			printf(" ");
-		    } 
-	         }
-
-	    	for(i=0;i<sizeof(tampon);i++){
-	            if(i<k){
-	      		printf("%c",isprint(tampon[i])?tampon[i]:'.');
-	            }
-	            else{
-	                printf(" ");
-	            }
-	    	}
-
-	    	printf("\n");
+	        size = hexdump(addr,tampon,size , sizeof(tampon));
 	    	size-=16;
-	  }
-    	assert(fread(tampon,1,size,fichier) == size);
-        printf(" 0x%08x  ",addr);
-        addr+=16;
-        for(i=0;i<N;i++){
-            if(i<size){
-                printf("%02x",tampon[i]);
-            }
-            else{
-                printf("  ");
-            }
-	    if((i+1)%4==0){
-		printf(" ");
-	    } 
-         }
-
-    	for(i=0;i<N;i++){
-            if(i<size){
-      		printf("%c",isprint(tampon[i])?tampon[i]:'.');
-            }
-            else{
-                printf(" ");
-            }
-		}
-    	printf("\n");
+	}
+	assert(fread(tampon,1,size,fichier) == size);
+    printf(" 0x%08x  ",addr);
+    addr+=16;
+    size = hexdump(addr,tampon,size, MAX);
 }
 
 //fonction global d'affichage du contenu d'une section
