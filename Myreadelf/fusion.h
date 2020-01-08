@@ -94,6 +94,12 @@ void modification_indx_sections(Donnees * d);
 void ecriture_entete(Elf32_Ehdr* elf_head, FILE* file, Donnees* d);
 
 
+/**Cette fonction permet l'ecriture des champs d'une section 
+ * Données : un indice i, une position set par rapport au debut de fichier, une section section , un stream FILE ouvert en ecriture, une structure  Données d
+ * Résultat : renoie un offset apres ecriture de la section 
+ *  * */
+Elf32_Off ecriture_champs_section(int i, long set, Elf32_Shdr section, FILE* file, Donnees* d);
+
 /**Cette fonction permet l'ecriture de la table des sections 
  * Données : l'entete ELF , un stream ouvert en "w", la structure  Données
  * Résultat : Elle ne renvoie rien
