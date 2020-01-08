@@ -244,14 +244,14 @@ void ecriture_entete(Elf32_Ehdr* elf_head, FILE* file, Donnees* d){
 }
 
 
-Elf32_Off ecriture_champs_section(int i, long set, Elf32_Shdr section, FILE* file, Donnees* d){
+EElf32_Off ecriture_champs_section(int i, long set, Elf32_Shdr section, FILE* file, Donnees* d){
 	Elf32_Off offset = 0;
 	fseek(file, set, SEEK_SET);
 	offset += fwrite(&d->f[i].newsh[0].sh_name,   sizeof(d->f[i].newsh[0].sh_name), 1, file);
 	offset += fwrite(&d->f[i].type,      sizeof(d->f[i].type), 1, file);
 	offset += fwrite(&section.sh_flags,     sizeof(section.sh_flags), 1, file);
 	offset += fwrite(&section.sh_addr,      sizeof(section.sh_addr), 1, file);
-	offset += fwrite(&d->f[i].newsh[0].sh_offset,    sizeof(d->f[i].offset), 1, file);
+	offset += fwrite(&d->f[i].offset,    sizeof(d->f[i].offset), 1, file);
 	offset += fwrite(&section.sh_size,      sizeof(section.sh_size), 1, file);
 	offset += fwrite(&d->f[i].sh_link,      sizeof(d->f[i].sh_link), 1, file);
 	offset += fwrite(&d->f[i].sh_info,      sizeof(d->f[i].sh_info), 1, file);
