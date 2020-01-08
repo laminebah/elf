@@ -26,7 +26,7 @@ do
 	do
 		if [ "$ligne" != "$error" ] 
 		then
-				echo "  $ligne" >> $tmp3
+				echo " $ligne" >> $tmp3
 		fi
 	done < $tmp2
 
@@ -39,6 +39,8 @@ do
     else 
         echo $file:"Test échoué" 
     fi
-     rm "difference.txt" "tmp1.txt" "tmp2.txt" "tmp3.txt" 2> /dev/null
+    
+    rm  $tmp1 $tmp2 $tmp3 $difference  2> /dev/null
+
 
 done
