@@ -249,14 +249,14 @@ Elf32_Off ecriture_champs_section(int i, long set, Elf32_Shdr section, FILE* fil
 	fseek(file, set, SEEK_SET);
 	offset += fwrite(&d->f[i].newsh[0].sh_name,   sizeof(d->f[i].newsh[0].sh_name), 1, file);
 	offset += fwrite(&d->f[i].type,      sizeof(d->f[i].type), 1, file);
-	offset += fwrite(&d->f[i].newsh[0].sh_flags,     sizeof(d->f[i].newsh[0].sh_flags), 1, file);
-	offset += fwrite(&d->f[i].newsh[0].sh_addr,      sizeof(d->f[i].newsh[0].sh_addr), 1, file);
+	offset += fwrite(&section.sh_flags,     sizeof(section.sh_flags), 1, file);
+	offset += fwrite(&section.sh_addr,      sizeof(section.sh_addr), 1, file);
 	offset += fwrite(&d->f[i].newsh[0].sh_offset,    sizeof(d->f[i].offset), 1, file);
-	offset += fwrite(&d->f[i].newsh[0].sh_size,      sizeof(d->f[i].size), 1, file);
+	offset += fwrite(&section.sh_size,      sizeof(section.sh_size), 1, file);
 	offset += fwrite(&d->f[i].sh_link,      sizeof(d->f[i].sh_link), 1, file);
 	offset += fwrite(&d->f[i].sh_info,      sizeof(d->f[i].sh_info), 1, file);
-	offset += fwrite(&d->f[i].newsh[0].sh_addralign, sizeof(d->f[i].newsh[0].sh_addralign), 1, file);
-	offset += fwrite(&d->f[i].newsh[0].sh_entsize,   sizeof(d->f[i].newsh[0].sh_entsize), 1, file);
+	offset += fwrite(&section.sh_addralign, sizeof(section.sh_addralign), 1, file);
+	offset += fwrite(&section.sh_entsize,   sizeof(section.sh_entsize), 1, file);
 
 	return offset;
 }
