@@ -4,17 +4,23 @@
 #include <stdio.h>
 #include <ctype.h>
 #define N 16
+#define SIZENAME 30
 
 							/*  gère l'affichage du contenu d'une section   */
 
 
 
+/**Cette fonction récupère le nom d'une section par son indice
+ * Données : l'entet elf,la table de section,l'indice idx puis un stream ouvert en lecture
+ * -Résultat : un string qui est le nom de la section de l'indice idx
+ * **/
+char* get_section_name(Elf32_Ehdr* header, Elf32_Shdr* sections_table, int idx, FILE* fichier);
 
 /***	Cette fonction test l' existance d' une section 
-		Données : une chaine de caractere, table des sections, l'entete et le nom d'une section
+		Données : table des sections, l'entete , le nom d'une section et un fichier
 		Résultat: entier(num de la section 'name' )
 ***/
-int existe_section(unsigned char *, Elf32_Shdr*, Elf32_Ehdr*, char *);
+int existe_section(Elf32_Shdr*, Elf32_Ehdr*, char * , FILE* );
 
 
 /***	Cette fonction affiche le contenu brute d'une section
