@@ -228,11 +228,11 @@ void modification_indx_sections(Donnees * d){
 }
 
 
-
 void ecriture_entete(Elf32_Ehdr* elf_head, FILE* file, Donnees* d){
 
 	elf_head->e_shoff = d->offset;
 	elf_head->e_shnum = d->nbS1;
+	elf_head->e_shstrndx = get_index_section(d,".shstrtab");
 	size_t nmemb;
 
 	fseek(file, 0, SEEK_SET);
@@ -253,29 +253,16 @@ void ecriture_entete(Elf32_Ehdr* elf_head, FILE* file, Donnees* d){
 
 }
 
+
 void ecriture_section_table(Elf32_Ehdr* elf_head, FILE* file, Donnees* d){
 	Elf32_Off offset = 0;
 	
-	//int ind = 0;
-	//Elf32_Off written = 0;
 	
-
-	
-	// for(ind = 0; strcmp(d->f[ind].name, ".shstrtab")  ; ind++);
-	// elf_head->e_shstrndx = ind;
-	
-	// // printf("Écriture de la table des noms de section dans le fichier à l'offset %#x\n", d->f[ind].offset);
-	// fseek(file, d->f[ind].offset, SEEK_SET);
-	// for(int i = 0; i < d->nbS1; i++)
-	// {	
-	// 		d->f[i].newsh->sh_name = written;
-	// 		printf("%u\n", d->f[i].newsh->sh_name);
-	// 		written += fwrite(d->f[i].name, 1, strlen(d->f[i].name) + 1, file);
-	// }
-	// d->f[ind].newsh[0].sh_size = written;
-
-	//debug("Il y a %d en-têtes de section, débutant à l'adresse de décalage 0x%x dans le nouveau fichier créé:\n\n",elf_head->e_shnum, elf_head->e_shoff);
 	fseek(file, elf_head->e_shoff, SEEK_SET);
+	for(int i = 0; i < d->nbS1; i++){
+		fwrite(&d->f[i].name, strlen(d->f[i].name) + 1, 1 , file);
+	}
+
 	for(int i = 0; i < d->nbS1; i++){
 		
 		fseek(file, d->offset + i * elf_head->e_shentsize, SEEK_SET);
