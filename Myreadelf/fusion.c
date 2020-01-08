@@ -244,44 +244,42 @@ void ecriture_entete(Elf32_Ehdr* elf_head, FILE* file, Donnees* d){
 }
 
 
-// void ecriture_section_table(Elf32_Ehdr* elf_head, FILE* file, Donnees* d){
-// 	Elf32_Off offset = 0;
+Elf32_Off ecriture_champs_section(int i, long set, Elf32_Shdr section, FILE* file, Donnees* d){
+	Elf32_Off offset = 0;
+	fseek(file, set, SEEK_SET);
+	offset += fwrite(&d->f[i].newsh[0].sh_name,   sizeof(d->f[i].newsh[0].sh_name), 1, file);
+	offset += fwrite(&d->f[i].type,      sizeof(d->f[i].type), 1, file);
+	offset += fwrite(&d->f[i].newsh[0].sh_flags,     sizeof(d->f[i].newsh[0].sh_flags), 1, file);
+	offset += fwrite(&d->f[i].newsh[0].sh_addr,      sizeof(d->f[i].newsh[0].sh_addr), 1, file);
+	offset += fwrite(&d->f[i].newsh[0].sh_offset,    sizeof(d->f[i].offset), 1, file);
+	offset += fwrite(&d->f[i].newsh[0].sh_size,      sizeof(d->f[i].size), 1, file);
+	offset += fwrite(&d->f[i].sh_link,      sizeof(d->f[i].sh_link), 1, file);
+	offset += fwrite(&d->f[i].sh_info,      sizeof(d->f[i].sh_info), 1, file);
+	offset += fwrite(&d->f[i].newsh[0].sh_addralign, sizeof(d->f[i].newsh[0].sh_addralign), 1, file);
+	offset += fwrite(&d->f[i].newsh[0].sh_entsize,   sizeof(d->f[i].newsh[0].sh_entsize), 1, file);
 
-// 	for(int i = 0; i < d->nbS1; i++){
+	return offset;
+}
 
-// 		fseek(file, d->f[elf_head->e_shstrndx].offset + d->f[i].newsh[0].sh_name, SEEK_SET);
-// 		fputs(d->f[i].name , file);
-// 	}
+void ecriture_section_table(Elf32_Ehdr* elf_head, FILE* file, Donnees* d){
+	Elf32_Off offset = 0;
 
-// 	for(int i = 0; i < d->nbS1; i++){
-		
-// 		fseek(file, d->offset + i * elf_head->e_shentsize, SEEK_SET);
-// 		offset += fwrite(&d->f[i].newsh[0].sh_name,   sizeof(d->f[i].newsh[0].sh_name), 1, file);
-// 		offset += fwrite(&d->f[i].type,      sizeof(d->f[i].type), 1, file);
-// 		offset += fwrite(&d->f[i].newsh[0].sh_flags,     sizeof(d->f[i].newsh[0].sh_flags), 1, file);
-// 		offset += fwrite(&d->f[i].newsh[0].sh_addr,      sizeof(d->f[i].newsh[0].sh_addr), 1, file);
-// 		offset += fwrite(&d->f[i].newsh[0].sh_offset,    sizeof(d->f[i].offset), 1, file);
-// 		offset += fwrite(&d->f[i].newsh[0].sh_size,      sizeof(d->f[i].size), 1, file);
-// 		offset += fwrite(&d->f[i].sh_link,      sizeof(d->f[i].sh_link), 1, file);
-// 		offset += fwrite(&d->f[i].sh_info,      sizeof(d->f[i].sh_info), 1, file);
-// 		offset += fwrite(&d->f[i].newsh[0].sh_addralign, sizeof(d->f[i].newsh[0].sh_addralign), 1, file);
-// 		offset += fwrite(&d->f[i].newsh[0].sh_entsize,   sizeof(d->f[i].newsh[0].sh_entsize), 1, file);
-// 		if(d->f[i].nbS==2){
-// 					offset += fwrite(&d->f[i].newsh[1].sh_name,   sizeof(d->f[i].newsh[1].sh_name), 1, file);
-// 					offset += fwrite(&d->f[i].type,  sizeof(d->f[i].type), 1, file);
-// 					offset += fwrite(&d->f[i].newsh[1].sh_flags,     sizeof(d->f[i].newsh[1].sh_flags), 1, file);
-// 					offset += fwrite(&d->f[i].newsh[1].sh_addr,      sizeof(d->f[i].newsh[1].sh_addr), 1, file);
-// 					offset += fwrite(&d->f[i].newsh[1].sh_offset,    sizeof(d->f[i].offset), 1, file);
-// 					offset += fwrite(&d->f[i].newsh[1].sh_size,      sizeof(d->f[i].size), 1, file);
-// 					offset += fwrite(&d->f[i].sh_link,      sizeof(d->f[i].sh_link), 1, file);
-// 					offset += fwrite(&d->f[i].sh_info,      sizeof(d->f[i].sh_info), 1, file);
-// 					offset += fwrite(&d->f[i].newsh[1].sh_addralign, sizeof(d->f[i].newsh[1].sh_addralign), 1, file);
-// 					offset += fwrite(&d->f[i].newsh[1].sh_entsize,   sizeof(d->f[i].newsh[1].sh_entsize), 1, file);
-// 		}
+	for(int i = 0; i < d->nbS1; i++){
 
-// 	}
-// 	d->offset = offset;
-// }
+		fseek(file, d->f[elf_head->e_shstrndx].offset + d->f[i].newsh[0].sh_name, SEEK_SET);
+		fputs(d->f[i].name , file);
+	}
+
+	for(int i = 0; i < d->nbS1; i++){
+		long set = d->offset + i * elf_head->e_shentsize;
+		offset = ecriture_champs_section(i, set, d->f[i].newsh[0], file, d);
+		if(d->f[i].nbS==2){
+			offset = ecriture_champs_section(i, set, d->f[i].newsh[1], file, d);
+		}
+
+	}
+	d->offset = offset;
+}
 
 void freemem(void *adr){
 	if (adr != NULL) free (adr);
