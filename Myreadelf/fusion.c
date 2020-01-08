@@ -253,14 +253,13 @@ void ecriture_entete(Elf32_Ehdr* elf_head, FILE* file, Donnees* d){
 
 }
 
-
 void ecriture_section_table(Elf32_Ehdr* elf_head, FILE* file, Donnees* d){
 	Elf32_Off offset = 0;
-	
-	
-	fseek(file, elf_head->e_shoff, SEEK_SET);
+
 	for(int i = 0; i < d->nbS1; i++){
-		fwrite(&d->f[i].name, strlen(d->f[i].name) + 1, 1 , file);
+
+		fseek(file, d->f[elf_head->e_shstrndx].offset + d->f[i].newsh[0].sh_name, SEEK_SET);
+		fputs(d->f[i].name , file);
 	}
 
 	for(int i = 0; i < d->nbS1; i++){
@@ -292,5 +291,6 @@ void ecriture_section_table(Elf32_Ehdr* elf_head, FILE* file, Donnees* d){
 	}
 	d->offset = offset;
 }
+
 
 
