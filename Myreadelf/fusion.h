@@ -5,7 +5,7 @@
 #include <elf.h>
 
 typedef struct {
-    Elf32_Shdr* newsh;		//contient : soit une section , ou deux sections si il y a la meme section dans l autre
+    Elf32_Shdr* newsh;		/* contient : soit une section , ou deux sections s'il y a la meme section dans l'autre fichier */
     Elf32_Word type;
     Elf32_Word size;                      
 	Elf32_Off offset;
@@ -13,7 +13,7 @@ typedef struct {
     Elf32_Word	sh_info;
     char* name;
 	int nbS;
-}Donnees_fusion; //contient les section a fusionnees
+}Donnees_fusion; //contient les sections a fusionnees
 
 typedef struct {
 	Elf32_Shdr* sh1, * sh2;
@@ -23,8 +23,6 @@ typedef struct {
 	int o_ecris;
 } Donnees;
 
-//libère de la mémoire
-void freemem(void *adr);
 
 /**Cette fonction initilaisation de des sections de la structure Donnees
  *-Données : deux section,une réfrence sur le nombre de section qui sera modifié,une entête
@@ -101,5 +99,29 @@ void ecriture_entete(Elf32_Ehdr* elf_head, FILE* file, Donnees* d);
  * Résultat : Elle ne renvoie rien
  *  * */
 void ecriture_section_table(Elf32_Ehdr* elf_head, FILE* file, Donnees* d);
+
+/**Cette fonction permet la liberation d'un objet 
+ * Données : objet 
+ * Résultat : Elle ne renvoie rien
+ *  * */
+void freemem(void *adr);
+
+/**Cette fonction permet les tables des fichiers ELF utilisees 
+ * Données : deux entete ELF , deux tables de section
+ * Résultat : Elle ne renvoie rien
+ *  * */
+void liberer_elf(Elf32_Ehdr * elf_head1 , Elf32_Ehdr * elf_head2 , Elf32_Shdr* sections_table1,Elf32_Shdr*  sections_table2);
+
+/**Cette fonction permet liberer la structure de fusion 
+ * Données : la structure  Données
+ * Résultat : Elle ne renvoie rien
+ *  * */
+void liberer_fusion(Donnees* d);
+
+/**Cette fonction permet de fermee les fichiers ouverts utlisees
+ * Données : 3 fichiers 
+ * Résultat : Elle ne renvoie rien
+ *  * */
+void fermer_fichiers(FILE* file_in1,FILE* file_in2, FILE* file_out);
 
 #endif
