@@ -131,7 +131,6 @@ void fusion_section2_in_section1(Donnees* d,FILE * file_in1, FILE* file_in2, Elf
 	}
 }
 void fusion_by_type(Donnees* d,FILE * file_in1, FILE* file_in2, Elf32_Ehdr* h1 ,Elf32_Ehdr* h2, Elf32_Word type){
-	//printf("offset : %06x\n",d->offset );
 	if(type == SHT_NULL){
 		d->f[0].newsh = malloc(sizeof(Elf32_Shdr)*1);
 		assert(d->f[0].newsh != NULL);
