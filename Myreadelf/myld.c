@@ -5,11 +5,11 @@
 #include <unistd.h>
 #include <string.h>
 #include "section_header.h"
-#include "print_content_section.h"
 #include "Elf_symbole.h"
 #include "print_symbole.h"
 #include "fusion.h"
 #include "reloc_table.h"
+
 
 int s_types[8] = {SHT_NULL , SHT_PROGBITS, SHT_NOBITS, SHT_REL, SHT_RELA, SHT_SYMTAB, SHT_STRTAB, SHT_ARM_ATTRIBUTES};
 
