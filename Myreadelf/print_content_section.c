@@ -138,40 +138,33 @@ void lire_contentsec(FILE *fichier,int addr,int size){
 //fonction global d'affichage du contenu d'une section
 void affiche_contentSection(unsigned char * sectionHexa, Elf32_Shdr* section, Elf32_Ehdr* header, FILE *fichier, char* nm){
 	            	int k,n = existe_section(section, header, nm, fichier);
-
 					unsigned char *name = (unsigned char *)get_section_name( header, section, n , fichier);
 					char* nameVide = "";
-					if (n == 0)
-					{
+					if (n == 0 ){
 						printf(" La section « %s » n'a pas de données à vidanger.\n", nameVide);
 					}
 					else if(n < 0){
 						printf(" readelf: AVERTISSEMENT: La section « %s » n'a pas été vidangée parce qu'inexistante!\n", nm);
-					}
-					else if(n>0 && n < header->e_shnum){
-						printf("\n");
-						printf("  Vidange hexadécimale de la section « %s » :\n",name);			
-						int addr= section[n].sh_addr;
-						int size= section[n].sh_size;
-						k = fseek(fichier, section[n].sh_offset, SEEK_SET);
-						assert(k != -1);
-						lire_contentsec(fichier,addr,size);
-						printf("\n");
-					}
-					else if(! (n>0 && n < header->e_shnum)){
+					}else if(n>0 && n < header->e_shnum){
+							printf("\n");
+							printf("  Vidange hexadécimale de la section « %s » :\n",name);			
+							int addr= section[n].sh_addr;
+							int size= section[n].sh_size;
+							k = fseek(fichier, section[n].sh_offset, SEEK_SET);
+							assert(k != -1);
+							if (size!=0){
+								lire_contentsec(fichier,addr,size);
+								printf("\n");
+							}
+					}else if(! (n>0 && n < header->e_shnum)){
 						printf(" readelf: AVERTISSEMENT: La section %d n'a pas été vidangée parce qu'inexistante !\n", n);
-					} 
-					else {
+					}else {
 						if (section[n].sh_type == SHT_NOBITS || section[n].sh_type == SHT_NULL || section[n].sh_size == 0){
 						printf(" La section « %s » n'a pas de données à vidanger.\n", name);
 						}else{
 						printf(" readelf: AVERTISSEMENT: La section %d n'a pas été vidangée parce qu'inexistante !\n", n);
 					}
 				}
-
-			
-
-
 }
 
 //lecture d'une section aprtir d'un fichier ELF (+ l`affichage depend du boolean bool) 
