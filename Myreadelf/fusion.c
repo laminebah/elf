@@ -5,11 +5,6 @@
 #include <assert.h>
 #include "fusion.h"
 
-void freemem(void *adr){
-	if (adr != NULL) free (adr);
-}
-
-
 Elf32_Shdr*  init_sections(Elf32_Shdr* sh, int* nbS, Elf32_Shdr* sections_table, Elf32_Ehdr* header){
 	sh = malloc(sizeof(Elf32_Shdr)*header->e_shnum);
 	assert (sh != NULL);
@@ -102,8 +97,6 @@ void fusion_section1_in_section2(Donnees* d,FILE * file_in1, FILE* file_in2, Elf
 					/*modificaion d'offset d'une section n'existe pas dans le deuxieme fichier  */
 					d->f[i].newsh[0].sh_offset = d->offset;
 					d->f[i].offset = d->offset;
-
-					
 				}
 			}
 
@@ -113,8 +106,6 @@ void fusion_section1_in_section2(Donnees* d,FILE * file_in1, FILE* file_in2, Elf
 		}
 	}
 }
-
-
 void fusion_section2_in_section1(Donnees* d,FILE * file_in1, FILE* file_in2, Elf32_Ehdr* h1 ,Elf32_Ehdr* h2, Elf32_Word type){
 	for (int i = 1; i < d->nbS2; ++i){
 		if(d->sh2[i].sh_type == type){
@@ -139,9 +130,8 @@ void fusion_section2_in_section1(Donnees* d,FILE * file_in1, FILE* file_in2, Elf
 		}
 	}
 }
-
-
 void fusion_by_type(Donnees* d,FILE * file_in1, FILE* file_in2, Elf32_Ehdr* h1 ,Elf32_Ehdr* h2, Elf32_Word type){
+	//printf("offset : %06x\n",d->offset );
 	if(type == SHT_NULL){
 		d->f[0].newsh = malloc(sizeof(Elf32_Shdr)*1);
 		assert(d->f[0].newsh != NULL);
@@ -150,6 +140,7 @@ void fusion_by_type(Donnees* d,FILE * file_in1, FILE* file_in2, Elf32_Ehdr* h1 ,
 		d->f[0].nbS = 1;
 		d->f[0].size = 0;
 		d->f[0].offset = 0;
+		d->offset = 0;
 		/* copie le nom de la section */
 		d->f[0].name = get_section_name(h1, d->sh1, 0, file_in1);
 	}else{
@@ -253,44 +244,69 @@ void ecriture_entete(Elf32_Ehdr* elf_head, FILE* file, Donnees* d){
 
 }
 
-void ecriture_section_table(Elf32_Ehdr* elf_head, FILE* file, Donnees* d){
-	Elf32_Off offset = 0;
 
-	for(int i = 0; i < d->nbS1; i++){
+// void ecriture_section_table(Elf32_Ehdr* elf_head, FILE* file, Donnees* d){
+// 	Elf32_Off offset = 0;
 
-		fseek(file, d->f[elf_head->e_shstrndx].offset + d->f[i].newsh[0].sh_name, SEEK_SET);
-		fputs(d->f[i].name , file);
-	}
+// 	for(int i = 0; i < d->nbS1; i++){
 
-	for(int i = 0; i < d->nbS1; i++){
+// 		fseek(file, d->f[elf_head->e_shstrndx].offset + d->f[i].newsh[0].sh_name, SEEK_SET);
+// 		fputs(d->f[i].name , file);
+// 	}
+
+// 	for(int i = 0; i < d->nbS1; i++){
 		
-		fseek(file, d->offset + i * elf_head->e_shentsize, SEEK_SET);
-		offset += fwrite(&d->f[i].newsh[0].sh_name,   sizeof(d->f[i].newsh[0].sh_name), 1, file);
-		offset += fwrite(&d->f[i].type,      sizeof(d->f[i].type), 1, file);
-		offset += fwrite(&d->f[i].newsh[0].sh_flags,     sizeof(d->f[i].newsh[0].sh_flags), 1, file);
-		offset += fwrite(&d->f[i].newsh[0].sh_addr,      sizeof(d->f[i].newsh[0].sh_addr), 1, file);
-		offset += fwrite(&d->f[i].newsh[0].sh_offset,    sizeof(d->f[i].offset), 1, file);
-		offset += fwrite(&d->f[i].newsh[0].sh_size,      sizeof(d->f[i].size), 1, file);
-		offset += fwrite(&d->f[i].sh_link,      sizeof(d->f[i].sh_link), 1, file);
-		offset += fwrite(&d->f[i].sh_info,      sizeof(d->f[i].sh_info), 1, file);
-		offset += fwrite(&d->f[i].newsh[0].sh_addralign, sizeof(d->f[i].newsh[0].sh_addralign), 1, file);
-		offset += fwrite(&d->f[i].newsh[0].sh_entsize,   sizeof(d->f[i].newsh[0].sh_entsize), 1, file);
-		if(d->f[i].nbS==2){
-					offset += fwrite(&d->f[i].newsh[1].sh_name,   sizeof(d->f[i].newsh[1].sh_name), 1, file);
-					offset += fwrite(&d->f[i].type,  sizeof(d->f[i].type), 1, file);
-					offset += fwrite(&d->f[i].newsh[1].sh_flags,     sizeof(d->f[i].newsh[1].sh_flags), 1, file);
-					offset += fwrite(&d->f[i].newsh[1].sh_addr,      sizeof(d->f[i].newsh[1].sh_addr), 1, file);
-					offset += fwrite(&d->f[i].newsh[1].sh_offset,    sizeof(d->f[i].offset), 1, file);
-					offset += fwrite(&d->f[i].newsh[1].sh_size,      sizeof(d->f[i].size), 1, file);
-					offset += fwrite(&d->f[i].sh_link,      sizeof(d->f[i].sh_link), 1, file);
-					offset += fwrite(&d->f[i].sh_info,      sizeof(d->f[i].sh_info), 1, file);
-					offset += fwrite(&d->f[i].newsh[1].sh_addralign, sizeof(d->f[i].newsh[1].sh_addralign), 1, file);
-					offset += fwrite(&d->f[i].newsh[1].sh_entsize,   sizeof(d->f[i].newsh[1].sh_entsize), 1, file);
-		}
+// 		fseek(file, d->offset + i * elf_head->e_shentsize, SEEK_SET);
+// 		offset += fwrite(&d->f[i].newsh[0].sh_name,   sizeof(d->f[i].newsh[0].sh_name), 1, file);
+// 		offset += fwrite(&d->f[i].type,      sizeof(d->f[i].type), 1, file);
+// 		offset += fwrite(&d->f[i].newsh[0].sh_flags,     sizeof(d->f[i].newsh[0].sh_flags), 1, file);
+// 		offset += fwrite(&d->f[i].newsh[0].sh_addr,      sizeof(d->f[i].newsh[0].sh_addr), 1, file);
+// 		offset += fwrite(&d->f[i].newsh[0].sh_offset,    sizeof(d->f[i].offset), 1, file);
+// 		offset += fwrite(&d->f[i].newsh[0].sh_size,      sizeof(d->f[i].size), 1, file);
+// 		offset += fwrite(&d->f[i].sh_link,      sizeof(d->f[i].sh_link), 1, file);
+// 		offset += fwrite(&d->f[i].sh_info,      sizeof(d->f[i].sh_info), 1, file);
+// 		offset += fwrite(&d->f[i].newsh[0].sh_addralign, sizeof(d->f[i].newsh[0].sh_addralign), 1, file);
+// 		offset += fwrite(&d->f[i].newsh[0].sh_entsize,   sizeof(d->f[i].newsh[0].sh_entsize), 1, file);
+// 		if(d->f[i].nbS==2){
+// 					offset += fwrite(&d->f[i].newsh[1].sh_name,   sizeof(d->f[i].newsh[1].sh_name), 1, file);
+// 					offset += fwrite(&d->f[i].type,  sizeof(d->f[i].type), 1, file);
+// 					offset += fwrite(&d->f[i].newsh[1].sh_flags,     sizeof(d->f[i].newsh[1].sh_flags), 1, file);
+// 					offset += fwrite(&d->f[i].newsh[1].sh_addr,      sizeof(d->f[i].newsh[1].sh_addr), 1, file);
+// 					offset += fwrite(&d->f[i].newsh[1].sh_offset,    sizeof(d->f[i].offset), 1, file);
+// 					offset += fwrite(&d->f[i].newsh[1].sh_size,      sizeof(d->f[i].size), 1, file);
+// 					offset += fwrite(&d->f[i].sh_link,      sizeof(d->f[i].sh_link), 1, file);
+// 					offset += fwrite(&d->f[i].sh_info,      sizeof(d->f[i].sh_info), 1, file);
+// 					offset += fwrite(&d->f[i].newsh[1].sh_addralign, sizeof(d->f[i].newsh[1].sh_addralign), 1, file);
+// 					offset += fwrite(&d->f[i].newsh[1].sh_entsize,   sizeof(d->f[i].newsh[1].sh_entsize), 1, file);
+// 		}
 
-	}
-	d->offset = offset;
+// 	}
+// 	d->offset = offset;
+// }
+
+void freemem(void *adr){
+	if (adr != NULL) free (adr);
 }
 
+void liberer_elf(Elf32_Ehdr * elf_head1 , Elf32_Ehdr * elf_head2 , Elf32_Shdr* sections_table1,Elf32_Shdr*  sections_table2){
+  freemem (elf_head1);
+  freemem (elf_head2);
+  freemem (sections_table1);
+  freemem (sections_table2);
+}
 
+void liberer_fusion(Donnees* d){
+	freemem(d->sh1);
+	freemem(d->sh2);
+	for (int i = 0; i < d->nbS1; ++i){
+		freemem(d->f[i].newsh);
+	}
+	freemem(d->f);
+	freemem(d);
+}
 
+void fermer_fichiers(FILE* file_in1,FILE* file_in2, FILE* file_out){
+  fclose (file_in1);
+  fclose (file_in2);
+  fclose (file_out);
+}
