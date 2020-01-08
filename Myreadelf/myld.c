@@ -71,3 +71,4 @@ int main (int argc, char** argv){
   fermer_fichiers(file_in1,file_in2,file_out);
 
   return EXIT_SUCCESS;
+}
