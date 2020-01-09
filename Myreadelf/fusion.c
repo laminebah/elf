@@ -24,7 +24,6 @@ void init_fusion(Donnees* d, Elf32_Shdr* sections_table1, Elf32_Ehdr* header1, E
 	d->nbS1 = 0;
 	d->nbS2 = 0;
 	d->offset = 0;
-	d->o_ecris = 1;
 
 	d->sh1 = init_sections(d->sh1,&d->nbS1,sections_table1, header1);
 	d->sh2 = init_sections(d->sh2,&d->nbS2,sections_table2, header2);
