@@ -1,6 +1,6 @@
 #ifndef _H_FUSION_
 #define _H_FUSION_
-#define SIZENAME 30
+#define SIZEN 30
 #include <stdio.h>
 #include <elf.h>
 
