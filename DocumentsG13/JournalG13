@@ -13,10 +13,11 @@ Phase 1: lecture elf
 étape2(-S): 13-12-2019/16-12-2019 par Amani et Belaid Mohamed;
 étape3(-x): 13-12-2019/16-12-2019 par DAN et HAFID;
 étape4(-s): 17-12-2019/18-12-2019 par Amadou et Mamadou;
-étape5(-r): 17-12-2019/(à remplir)   par Amani et Belaid Mohamed;
+étape5(-r): 17-12-2019/par Amani et Belaid Mohamed;
 script_test étape(1,2,4) : 18-12-2019 par Amadou et Mamadou;
 script_test étape(3): 17-12-2019 / 18-12-2019 par DAN et HAFID;
 
 Phase 2: Fusion
 
-étape6(ld): 07-01-2020/par DAN et HAFID;
+étape6(ld:fusion et ecriture des tables des sections + l'ecriture d'entete): 07-01-2020/par DAN et HAFID;
+étape7(ld:fusion de la table des symboles): 08-01-2020/par Amadou et Mamadou;
