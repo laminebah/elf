@@ -30,7 +30,12 @@ else
 	TesTop $1
 	if [ $1 = "-x" ]
 	then
-		./Scripts_tests/test_content_section.sh -x 3
+		if [ $# -eq 2 ]
+		then
+			./Scripts_tests/test_content_section.sh -x $1
+		else
+			echo "Donner un nom ou un numero de section "
+		fi 
 	else
 		for file in $example
 		do
