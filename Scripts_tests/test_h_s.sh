@@ -14,6 +14,9 @@ TesTop () {
 	elif [ $1 = "-r" ]
 	then
 		echo "*********Test relocation table *************"
+	elif [ $1 = "-x" ]
+	then
+		echo "----------- TEST CONTENT SECTION ---------"
 	fi
 }
 
@@ -25,23 +28,30 @@ then
 	exit 0
 else
 	TesTop $1
-	for file in $example
-	do
-			if [ -d $file ]
-			then
-				echo "$file -- error"
-			else 
-				if [ $1 != "-x" ]
+	if [ $1 = "-x" ]
+	then
+		./Scripts_tests/test_content_section.sh -x 3
+	else
+		for file in $example
+		do
+				if [ -d $file ]
 				then
-					./readelf $1 $file > Scripts_tests/tmp0.txt
-					readelf $1 $file > Scripts_tests/tmp1.txt
-					if diff Scripts_tests/tmp0.txt Scripts_tests/tmp1.txt > /dev/null
-					then 
-						echo "$file -- success"
-					else
-						echo "$file -- error"
+					echo "$file -- error"
+				else 
+					if [ $1 != "-x" ]
+					then
+						./readelf $1 $file > Scripts_tests/tmp0.txt
+						readelf $1 $file > Scripts_tests/tmp1.txt
+						if diff Scripts_tests/tmp0.txt Scripts_tests/tmp1.txt > /dev/null
+						then 
+							echo "$file -- success"
+						else
+							echo "$file -- error"
+						fi
+						
 					fi
+					
 				fi
-			fi
-	done
+		done
+	fi
 fi	
