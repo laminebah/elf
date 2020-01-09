@@ -14,10 +14,10 @@
 
 //retourner le nom d'une section a travers son indice  
 char* get_section_name(Elf32_Ehdr* header, Elf32_Shdr* sections_table, int idx, FILE* fichier){
-	char *name = malloc(SIZENAME*sizeof(char));
+	char *name = malloc(SIZEN*sizeof(char));
 	assert (name!= NULL);
 	fseek(fichier, sections_table[header->e_shstrndx].sh_offset + sections_table[idx].sh_name, SEEK_SET);
-	char *s=fgets(name, SIZENAME, fichier);
+	char *s=fgets(name, SIZEN, fichier);
 	assert (s != NULL);
 	return name;
 }
@@ -87,15 +87,17 @@ void affiche_contentSection(unsigned char * sectionHexa, Elf32_Shdr* section, El
 					else if(n < 0){
 						printf(" readelf: AVERTISSEMENT: La section « %s » n'a pas été vidangée parce qu'inexistante!\n", nm);
 					}else if(n>0 && n < header->e_shnum){
-							printf("\n");
-							printf("  Vidange hexadécimale de la section « %s » :\n",name);			
 							int addr= section[n].sh_addr;
 							int size= section[n].sh_size;
-							k = fseek(fichier, section[n].sh_offset, SEEK_SET);
-							assert(k != -1);
-							if (size!=0){
-								lire_contentsec(fichier,addr,size);
-								printf("\n");
+							if (size!= 0){
+									printf("\n");
+									printf("  Vidange hexadécimale de la section « %s » :\n",name);	
+									k = fseek(fichier, section[n].sh_offset, SEEK_SET);
+									assert(k != -1);
+										lire_contentsec(fichier,addr,size);
+										printf("\n");
+							}else{
+								printf(" La section « %s » n'a pas de données à vidanger.\n", name);
 							}
 					}else if(! (n>0 && n < header->e_shnum)){
 						printf(" readelf: AVERTISSEMENT: La section %d n'a pas été vidangée parce qu'inexistante !\n", n);
