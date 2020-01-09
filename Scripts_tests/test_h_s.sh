@@ -14,9 +14,6 @@ TesTop () {
 	elif [ $1 = "-r" ]
 	then
 		echo "*********Test relocation table *************"
-	elif [ $1 = "-x" ]
-	then
-		echo "----------- TEST CONTENT SECTION ---------"
 	fi
 }
 
@@ -28,35 +25,31 @@ then
 	exit 0
 else
 	TesTop $1
-	if [ $1 = "-x" ]
-	then
-		if [ $# -eq 2 ]
-		then
-			./Scripts_tests/test_content_section.sh -x $1
-		else
-			echo "Donner un nom ou un numero de section "
-		fi 
-	else
-		for file in $example
-		do
-				if [ -d $file ]
+	for file in $example
+	do
+			if [ -d $file ]
+			then
+				echo "$file -- error"
+			else 
+				if [ $1 != "-x" ]
 				then
-					echo "$file -- error"
-				else 
-					if [ $1 != "-x" ]
-					then
-						./readelf $1 $file > Scripts_tests/tmp0.txt
-						readelf $1 $file > Scripts_tests/tmp1.txt
-						if diff Scripts_tests/tmp0.txt Scripts_tests/tmp1.txt > /dev/null
-						then 
-							echo "$file -- success"
-						else
-							echo "$file -- error"
-						fi
-						
-					fi
+					./readelf $1 $file > Scripts_tests/tmp0.txt
+					readelf $1 $file > Scripts_tests/tmp1.txt
+					nbl1=$(wc -l Scripts_tests/tmp0.txt | cut -d ' ' -f1)
+					echo $nbl1
 					
+					if diff Scripts_tests/tmp0.txt Scripts_tests/tmp1.txt > /dev/null
+					then 
+						if [ $nbl1 -ne 0 ]
+						then
+							echo "$file -- succes"
+						else
+							echo "$file --error"
+						fi
+					else
+						echo "$file -- error"
+					fi
 				fi
-		done
-	fi
+			fi
+	done
 fi	
