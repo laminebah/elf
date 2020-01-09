@@ -1,12 +1,18 @@
 #include "reloc_table.h"
 
+
+// Récupère le contenu de la table des réalocations et le renvoie
 Elf32_Rel *read_REL_tab(Elf32_Ehdr h, Elf32_Shdr *S, FILE *file, int index){
+		
 		int i;
-		int RelSize=S[index].sh_size/S[index].sh_entsize;
+		int RelSize=S[index].sh_size / S[index].sh_entsize;
 		Elf32_Rel *REL_tab = malloc(sizeof(Elf32_Rel)*RelSize);
+		
+		// On se positionne
 		fseek(file, S[index].sh_offset, SEEK_SET);
 
-		for(i=0;i<RelSize;i++){
+		// On parcours la table de réalocations 
+		for(i=0; i<RelSize; i++){
 			int f __attribute__((unused)) = fread(&REL_tab[i],1,sizeof(Elf32_Rel),file);
 			REL_tab[i].r_offset  = val_32(h, REL_tab[i].r_offset);	
 			REL_tab[i].r_info    = val_32(h, REL_tab[i].r_info);
@@ -15,6 +21,8 @@ Elf32_Rel *read_REL_tab(Elf32_Ehdr h, Elf32_Shdr *S, FILE *file, int index){
 } 
 
 
+
+// Retourne la chaîne de caractères qui correspond au type de la table de réalocations
 char *reloc_types(Elf32_Rel REL_tab){
 	char *type = malloc(SIZENAME*sizeof(char));
 	switch(ELF32_R_TYPE(REL_tab.r_info)){
@@ -103,9 +111,10 @@ char *reloc_types(Elf32_Rel REL_tab){
 }
 
 
+
+// Retourne le type du symbole sous forme de chaîne de caractères
 char* get_sym_type (unsigned int type){
-  switch (type)
-    {
+  switch (type){
     case STT_NOTYPE:
     	return "NOTYPE";
     case STT_OBJECT:
@@ -125,8 +134,10 @@ char* get_sym_type (unsigned int type){
 }
 
 
+// Affiche la 1ère ligne de la table de réalocations
 void print_RelTab_head(int RelSize, unsigned char *sh_name, unsigned int sh_offset){
 
+	// Affichage de la 1ère phrase
 	printf("Section de réadressage '%s' à l'adresse de décalage 0x%3x contient %d"
 		,sh_name
 		,sh_offset
@@ -137,6 +148,7 @@ void print_RelTab_head(int RelSize, unsigned char *sh_name, unsigned int sh_offs
 	else
 		printf(" entrées:\n");
 
+	// Affichage des titres des colonnes
 	printf(" %-11s %-7s %-15s %-10s %s\n"
 	,"Décalage"
 	,"Info"
@@ -146,38 +158,49 @@ void print_RelTab_head(int RelSize, unsigned char *sh_name, unsigned int sh_offs
 
 }
 
+
+
+// Affiche le contenu de la table de réalocations
 void affiche_Relocation(Elf32_Shdr*Sec, Elf32_Ehdr h, Elf32_Sym *Sym, unsigned char *strtab, FILE *file){
 	int RelSize;
 	int i,j;
-	char* type="";
-	char *name=malloc(SIZENAME*sizeof(char));
-	if(h.e_type!=ET_REL){
+	char* type = "";
+	char *name = malloc(SIZENAME*sizeof(char));
+	
+	if(h.e_type != ET_REL){
 		printf("Il n'y a pas de réadressage dans ce fichier.\n");
-	}else{
-		for(i=0;i<h.e_shnum;i++){
-			if(Sec[i].sh_type==SHT_REL){
+	}
+
+	else{
+		// On parcours la section
+		for(i = 0; i < h.e_shnum; i++){
+			if(Sec[i].sh_type == SHT_REL){
 				
 				printf("\n");
-				RelSize=Sec[i].sh_size/Sec[i].sh_entsize;
+				RelSize = Sec[i].sh_size / Sec[i].sh_entsize;
 
 				print_RelTab_head(RelSize, strtab+Sec[i].sh_name, Sec[i].sh_offset);
 
-				Elf32_Rel *REL_tab=read_REL_tab(h, Sec, file, i);
+				Elf32_Rel *REL_tab = read_REL_tab(h, Sec, file, i);
 
-
-				for(j=0;j<RelSize;j++){
+				// On parcours la table de réalocations
+				for(j = 0; j < RelSize; j++){
 					int indice_name = ELF32_R_SYM(REL_tab[j].r_info);
 					int indice_symbol = ELF32_R_SYM(REL_tab[j].r_info);
-					
+
+					// On récupère le type du symbole
 					char * Stype = get_sym_type(ELF32_ST_TYPE(Sym[indice_symbol].st_info));
 					
-					if(strcmp(Stype,"NOTYPE")==0){
+					if(strcmp(Stype,"NOTYPE") == 0){
         				name = SymName(Sec, Sym[indice_name].st_name, Sec[indice_symbol].sh_link, file);
-					}else if(strcmp(Stype,"SECTION")==0){
+					}else if(strcmp(Stype,"SECTION") == 0){
         				name = SymName(Sec, Sec[Sym[indice_name].st_shndx].sh_name, h.e_shstrndx, file);
 					}
-					type=reloc_types(REL_tab[j]);
 
+					// On récupère le type de la table de réalocations
+					type = reloc_types(REL_tab[j]);
+
+					// On affiche tous les éléments
 					printf("%08x  %08x %-18s%08x   %s\n"
 					,REL_tab[j].r_offset
 					,REL_tab[j].r_info
@@ -193,9 +216,15 @@ void affiche_Relocation(Elf32_Shdr*Sec, Elf32_Ehdr h, Elf32_Sym *Sym, unsigned c
 }
 
 
+// Renvoie le nom d'une table des symboles sous forme de chaîne de caractères
 char* SymName(Elf32_Shdr *Sec, int index, int indexStrSym, FILE *file){
+  
   char* name = malloc(SIZENAME*sizeof(char));
+  
+  // On se positionne 
   fseek(file,Sec[indexStrSym].sh_offset + index, SEEK_SET);
+
+  // On lit le nom
   char *g __attribute__((unused)) = fgets(name, SIZENAME, file);
 
   return name;
