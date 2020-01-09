@@ -274,7 +274,6 @@ void ecriture_section_table(Elf32_Ehdr* elf_head, FILE* file, Donnees* d){
 	d->offset = offset;
 }
 
-
 //le nom d'un symbole à l'indice i
 char *nom_symbole_ndx (Elf32_Sym *symb,FILE *fin,Elf32_Shdr *sectTab,int index,int i) {
 	char *tampon ;
@@ -379,31 +378,19 @@ SymbTab *fusion_symbols (Donnees* d,Elf32_Shdr *sec1,Elf32_Shdr *sec2,Elf32_Ehdr
 		strcat (buff,st_s2 -> nomSymbs [i]);
 		int nd =  ndx_nom (sout,buff);
 		if (nd > 0) {
-
-			//printf ("%s\n",sout->nom);
-			//printf ("%s trouvé au rang %d:%d\n",sout->nomSymbs[i],nd,i);
 			int is_gOut = ELF32_ST_BIND (sout -> symbTab[nd].st_info) == STB_GLOBAL;
 			int is_gSt2 = ELF32_ST_BIND (st_s2 -> symbTab[i].st_info) == STB_GLOBAL;
 			if (is_gOut && is_gSt2 && sout->symbTab[nd].st_shndx != SHN_UNDEF && st_s2->symbTab[i].st_shndx != SHN_UNDEF) {
 				printf ("multiple définition de %s\n",buff);
 				return NULL;
 			} else if (is_gOut && is_gSt2 && sout->symbTab[nd].st_shndx == SHN_UNDEF && st_s2->symbTab[i].st_shndx != SHN_UNDEF) {
-					//on remplace st_2 par sout
-				//printf("%s\n",st_s2->nomSymbs[i]);
 				sout->symbTab[nd]. st_value   = st_s2 -> symbTab [i].st_value; 
 				sout->symbTab[nd]. st_size    += st_s2 -> symbTab [i].st_size;
 				sout->symbTab[nd]. st_info = st_s2 -> symbTab [i].st_info;
 				sout->symbTab[nd]. st_other   = st_s2 -> symbTab [i].st_other;
 				sout->symbTab[nd]. st_shndx = st_s2 -> symbTab [i].st_shndx;
-				//nb ++;
-				//sout -> nbsymb = nb;
-			} else if (is_gOut && is_gSt2 && sout->symbTab[nd].st_shndx == SHN_UNDEF && st_s2->symbTab[i].st_shndx == SHN_UNDEF) {
-				//les deux sont non définis une seule des deux doit rester
-				//on conserve la première donc aucun changement n'est fait
 
-				//nb ++;
 			} else if (is_gOut && is_gSt2) {
-				//printf ("%s\n",st_s2 -> nomSymbs [i]);
 				sout->symbTab[nd]. st_value   = st_s2 -> symbTab [i].st_value; 
 				sout->symbTab[nd]. st_size    += st_s2 -> symbTab [i].st_size;
 				sout->symbTab[nd]. st_info = st_s2 -> symbTab [i].st_info;
@@ -413,8 +400,6 @@ SymbTab *fusion_symbols (Donnees* d,Elf32_Shdr *sec1,Elf32_Shdr *sec2,Elf32_Ehdr
 			} else if (!is_gOut && !is_gSt2) {
 				//on ajoute ce  symbole
 				int id = nb;
-				//printf ("%d\n",id);
-				//int *tab = malloc(sizeof(int)*5);
 				sout->symbTab = realloc (sout->symbTab,10*(id + 1)*sizeof(Elf32_Sym));
 				sout->symbTab [id].st_value = st_s2 -> symbTab [i].st_value;
 				sout->symbTab [id].st_size = st_s2->symbTab [i].st_size;
@@ -423,11 +408,9 @@ SymbTab *fusion_symbols (Donnees* d,Elf32_Shdr *sec1,Elf32_Shdr *sec2,Elf32_Ehdr
 				sout->symbTab [id].st_shndx = st_s2->symbTab [i].st_shndx;
 				sout->nomSymbs = realloc (sout->nomSymbs,10*id*sizeof(char*));
 				sout->nomSymbs [id] = malloc (sizeof(char)*strlen(st_s2->nomSymbs[i]));
-				//printf ("ici3 %s\n",st_s2 ->nomSymbs [i]);
 				strcpy(sout->nomSymbs[id],"");
 				strcat(sout->nomSymbs[id],st_s2->nomSymbs[i]);
 				nb ++;
-				//sout -> nbsymb = nb;
 			}
 
 		} else {
@@ -443,17 +426,13 @@ SymbTab *fusion_symbols (Donnees* d,Elf32_Shdr *sec1,Elf32_Shdr *sec2,Elf32_Ehdr
 				sout->symbTab [id].st_name  = st_s2-> symbTab [i].st_name;
 				sout->nomSymbs = realloc (sout->nomSymbs,10*id*sizeof(char*));
 				sout->nomSymbs [id] = malloc (sizeof(char)*strlen(st_s2->nomSymbs[i]));
-				//printf ("ici2 %s\n",st_s2 ->nomSymbs [i]);
 				strcpy(sout->nomSymbs[id],"");
 				strcat(sout->nomSymbs[id],st_s2->nomSymbs[i]);
 				nb ++;
-				//sout -> nbsymb = nb;
 			}
 			if (ELF32_ST_BIND (st_s2 -> symbTab[i].st_info) == STB_LOCAL && 
 				ELF32_ST_BIND (sout -> symbTab[i].st_info) == STB_LOCAL) {
 				if (strlen(st_s2->nomSymbs[i]) > 0) {
-				
-					//printf ("ici1%s\n",st_s2->nomSymbs [i]);
 					int id = nb;
 					sout->symbTab = realloc (sout->symbTab,10*(id + 1)*sizeof(Elf32_Sym));
 					sout->symbTab [id].st_value = st_s2 -> symbTab [i].st_value;
@@ -466,30 +445,23 @@ SymbTab *fusion_symbols (Donnees* d,Elf32_Shdr *sec1,Elf32_Shdr *sec2,Elf32_Ehdr
 					sout->nomSymbs [id] = malloc (sizeof(char)*strlen(st_s2->nomSymbs[i]));
 					strcpy(sout->nomSymbs[id],"");
 					strcat(sout->nomSymbs[id],st_s2->nomSymbs[i]);
-					//printf ("%d:%s\n",id,sout->nomSymbs[i]);
 					nb ++;
-					
 				}
 			}
 		}
 	}
 	sout->nbsymb = nb;
-	printf ("%d\n",sout->nbsymb);
-	//sort_new_symbol_table(sout);
 	for (int i = 0; i < sout->nbsymb; i ++) {
 		printf("%d:%06d:%s\n",i,sout->symbTab[i].st_value,sout->nomSymbs[i]);
 	}
-	return sout;
-		
+	return sout;	
 }
 
 void ecris_new_symb_in_file (FILE *fout,Donnees *d,SymbTab *sout) {
 	int ind = get_index_section(d ,".symtab");
 	int oldf = d -> f[ind].offset;
 	int n_of = oldf;
-	//printf ("%d\n",ind);
 	fseek (fout,oldf,SEEK_SET);
-	printf("%d\n",sout->nbsymb);
 	for (int i = 0; i < sout->nbsymb ; i ++) {
 		n_of += fwrite(&sout->symbTab[i].st_name,sizeof(sout->symbTab[i].st_name),1,fout);
 		n_of += fwrite(&sout->symbTab[i].st_value,sizeof(sout->symbTab[i].st_value),1,fout);
@@ -504,10 +476,6 @@ void ecris_new_symb_in_file (FILE *fout,Donnees *d,SymbTab *sout) {
 	printf ("ecriture_entete de la tables des noms des symboles dans le fichier\n");
 	fseek (fout,d->f[ind].offset,SEEK_SET);
 	int nb = 0;
-	/*for (int i = 0; i < sout -> nbsymb ; i ++) {
-		n_of += fwrite (sout->nomSymbs[i],strlen(sout->nomSymbs[i]),1,fout);
-		nb += strlen (sout->nomSymbs[i]);
-	}*/
 	d -> f [ind].newsh -> sh_size = nb; 
 }
 
