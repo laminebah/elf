@@ -20,7 +20,6 @@ typedef struct {
 	Donnees_fusion *f ;
 	int nbS1, nbS2;
 	Elf32_Off offset;
-	int o_ecris;
 } Donnees;
 
 typedef struct {
