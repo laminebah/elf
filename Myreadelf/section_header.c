@@ -1,10 +1,5 @@
 #include "section_header.h"
 
-/////////////////////////////////////////////////////////
-//////////////////////// étape 2 ////////////////////////
-/////////////////////////////////////////////////////////
-
-
 int32_t val_32(Elf32_Ehdr h, int32_t value){
 	if(h.e_ident[EI_DATA]==ELFDATA2MSB)
 		return __bswap_32(value);
@@ -17,8 +12,6 @@ int16_t val_16(Elf32_Ehdr h, int16_t value){
 		return __bswap_16(value);
 	return value;
 }
-
-
 
 
 void read_section(FILE *fichier, Elf32_Shdr *s, Elf32_Ehdr h){
@@ -134,11 +127,13 @@ void print_section (FILE *file, Elf32_Shdr *T, Elf32_Ehdr *e){
 	char *name = malloc(SIZENAME*sizeof(char)), *type, *flag;
 	int i;
 	
-
-	printf("Il y a %d en-têtes de section, débutant à l'adresse de décalage 0x%x:\n\n",e->e_shnum, e->e_shoff);
+	// Affichage des 1ères lignes de la section
+	printf("Il y a %d en-têtes de section, débutant à l'adresse de décalage 0x%x:\n\n", e->e_shnum, e->e_shoff);
 	printf("En-têtes de section :\n");
 	printf("  [Nr] Nom               Type            Adr      Décala.Taille ES Fan LN Inf Al\n");	
-	for (i=0; i<e->e_shnum; i++){	 //tant qu'on a des entrées à lire
+	
+	 // Tant qu'on a des entrées à lire
+	for (i=0; i<e->e_shnum; i++){	
 		S = T[i];
 
 		// Récupération du type 
@@ -150,10 +145,11 @@ void print_section (FILE *file, Elf32_Shdr *T, Elf32_Ehdr *e){
 		flag = read_flags(flag, S.sh_flags);
 
 		// Récupération du nom
-		fseek(file, T[e->e_shstrndx].sh_offset+S.sh_name, SEEK_SET);
+		fseek(file, T[e->e_shstrndx].sh_offset + S.sh_name, SEEK_SET);
 		char *g __attribute__((unused)) = fgets(name, SIZENAME, file);
 		if (strcmp(name,".rel.debug_aranges") == 0) 
 			name [strlen(name) - 1] ='\0';
+		
 		// Affichage de tous les éléments de la section
 		printf("%s", name);print_espace (strlen(name),18);
 		printf("%s", type);print_espace (strlen(type),15);
@@ -168,6 +164,7 @@ void print_section (FILE *file, Elf32_Shdr *T, Elf32_Ehdr *e){
 		printf(" %2d", S.sh_addralign);
 		printf("\n");
 	}
+	
 	printf("Clé des fanions :\n");
 	printf("  W (écriture), A (allocation), X (exécution), M (fusion), S (chaînes), I (info),\n");
 	printf("  L (ordre des liens), O (traitement supplémentaire par l'OS requis), G (groupe),\n");
@@ -177,10 +174,10 @@ void print_section (FILE *file, Elf32_Shdr *T, Elf32_Ehdr *e){
 }
 
 void get_sh_values(Elf32_Shdr **sectionHeader, FILE* f,Elf32_Ehdr *h){
-	fseek(f,h->e_shoff,SEEK_SET);
+	fseek(f, h->e_shoff, SEEK_SET);
 	int i;
-    for(i=0;i<h->e_shnum;i++)
-    	read_section(f,&((*sectionHeader)[i]),*h);
+	for(i=0; i < h->e_shnum; i++)
+    		read_section(f, &((*sectionHeader)[i]), *h);
 }
 
 
