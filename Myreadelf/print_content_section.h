@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #define MAX 16
-#define SIZENAME 30
+#define SIZEN 30
 
 							/*  gère l'affichage du contenu d'une section   */
 
