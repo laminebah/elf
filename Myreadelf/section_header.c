@@ -1,5 +1,7 @@
 #include "section_header.h"
 
+
+// Retourne l'entier passé en paramètre en little endian
 int32_t val_32(Elf32_Ehdr h, int32_t value){
 	if(h.e_ident[EI_DATA]==ELFDATA2MSB)
 		return __bswap_32(value);
@@ -7,6 +9,7 @@ int32_t val_32(Elf32_Ehdr h, int32_t value){
 }
 
 
+// Retourne l'entier passé en paramètre en little endian
 int16_t val_16(Elf32_Ehdr h, int16_t value){
 	if(h.e_ident[EI_DATA]==ELFDATA2MSB)
 		return __bswap_16(value);
@@ -14,6 +17,7 @@ int16_t val_16(Elf32_Ehdr h, int16_t value){
 }
 
 
+// Affecte les bonne valeurs (en little endian) de la section du fichier f à la section s
 void read_section(FILE *fichier, Elf32_Shdr *s, Elf32_Ehdr h){
 	size_t f __attribute__((unused)) = fread(s,1,sizeof(Elf32_Shdr),fichier);
 	
@@ -31,60 +35,78 @@ void read_section(FILE *fichier, Elf32_Shdr *s, Elf32_Ehdr h){
 }
 
 
+// Retourne le type de la section s sous forme de chaîne de caractères
 char *read_type (Elf32_Shdr s){
 	char *type = "";
 	switch(s.sh_type){
 		case SHT_NULL:
 			type = "NULL";
 			break;
+			
 		case SHT_PROGBITS:
 			type = "PROGBITS";
 			break;
+			
 		case SHT_SYMTAB:
 			type = "SYMTAB";
 			break;
+			
 		case SHT_STRTAB:
 			type = "STRTAB";
 			break;
+			
 		case SHT_RELA:
 			type = "RELA";
 			break;
+			
 		case SHT_HASH:
 			type = "HASH";
 			break;
+			
 		case SHT_DYNAMIC:
 			type = "DYNAMIC";
 			break;
+			
 		case SHT_NOTE:
 			type = "NOTE";
 			break;
+			
 		case SHT_NOBITS:
 			type = "NOBITS";
 			break;
+			
 		case SHT_REL:
 			type = "REL";
 			break;
+			
 		case SHT_SHLIB:
 			type = "SHLIB";
 			break;
+			
 		case SHT_DYNSYM:
 			type = "DYNSYM";
 			break;
+			
 		case SHT_LOPROC:
 			type = "LOPROC";
 			break;
+			
 		case SHT_HIPROC:
 			type = "HIPROC";
 			break;
+			
 		case SHT_LOUSER:
 			type = "LOUSER";
 			break;
+			
 		case SHT_HIUSER:
 			type = "HIUSER";
 			break;
+		
 		case SHT_ARM_ATTRIBUTES:
 			type = "ARM_ATTRIBUTES";
 			break;
+			
 		default:
 			break;
 	}
@@ -92,6 +114,7 @@ char *read_type (Elf32_Shdr s){
 }
 
 
+// Retourne le flag de la section s sous forme de chaîne de caractères
 char *read_flags (char * flags, Elf32_Word flag){	
 	
 	if (SHF_WRITE & flag)
@@ -117,10 +140,12 @@ char *read_flags (char * flags, Elf32_Word flag){
 	return flags;
 }
 
+
 void print_espace (int i,int nb) {
 	for (;i <nb; i ++) printf(" ");
 }
 
+// Affiche la section T d'un fichier file
 void print_section (FILE *file, Elf32_Shdr *T, Elf32_Ehdr *e){
 	
 	Elf32_Shdr S;
@@ -147,6 +172,7 @@ void print_section (FILE *file, Elf32_Shdr *T, Elf32_Ehdr *e){
 		// Récupération du nom
 		fseek(file, T[e->e_shstrndx].sh_offset + S.sh_name, SEEK_SET);
 		char *g __attribute__((unused)) = fgets(name, SIZENAME, file);
+		
 		if (strcmp(name,".rel.debug_aranges") == 0) 
 			name [strlen(name) - 1] ='\0';
 		
@@ -173,9 +199,12 @@ void print_section (FILE *file, Elf32_Shdr *T, Elf32_Ehdr *e){
 	free(name);
 }
 
+// Récupère toutes les valeurs de la section en little endian et les mets dans sectionHeader
 void get_sh_values(Elf32_Shdr **sectionHeader, FILE* f,Elf32_Ehdr *h){
+	// On se positionne
 	fseek(f, h->e_shoff, SEEK_SET);
 	int i;
+	// On parcours la section
 	for(i=0; i < h->e_shnum; i++)
     		read_section(f, &((*sectionHeader)[i]), *h);
 }
