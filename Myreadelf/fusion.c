@@ -142,7 +142,7 @@ void fusion_by_type(Donnees* d,FILE * file_in1, FILE* file_in2, Elf32_Ehdr* h1 ,
 char* split_name(char * name){
   char* ptr = NULL;
   int i=1,k=0;
-  ptr = (char* ) malloc(sizeof(char) * SIZENAME);
+  ptr = (char* ) malloc(sizeof(char) * SIZEN);
   if (ptr == NULL)
       printf("erreur d'allocation pour ptr\n");
 
