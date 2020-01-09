@@ -23,6 +23,15 @@ typedef struct {
 	int o_ecris;
 } Donnees;
 
+typedef struct {
+	Elf32_Sym *symbTab;//table de symbole
+	int nbsymb;//nombre de symbole de la table
+	int ndxStr;//indexe
+	char *nom;//nom de la table des symboles
+	char **nomSymbs;//tableau de nom des symboles
+	int tailnoms;
+}SymbTab;
+
 
 /**Cette fonction initilaisation de des sections de la structure Donnees
  *-Données : deux section,une réfrence sur le nombre de section qui sera modifié,une entête
@@ -124,5 +133,36 @@ void liberer_fusion(Donnees* d);
  * Résultat : Elle ne renvoie rien
  *  * */
 void fermer_fichiers(FILE* file_in1,FILE* file_in2, FILE* file_out);
+
+/**Cette fonction fusionne deux tables de symboles 
+  -Données :
+  -Résultat : renvoie -1 si la fusion a échouée sinon > -1
+**/
+SymbTab *fusion_symbols (Donnees* d,Elf32_Shdr *sec1,Elf32_Shdr *sec2,Elf32_Ehdr *h1,Elf32_Ehdr *h2,
+	Elf32_Sym *sym1,Elf32_Sym *sym2,FILE *f1,FILE *f2,int nbs2,int ndxsym2,int ndxsym1,int nbs1);
+
+/**Cette fonction fait presque une duplication d'une table de symbole en initialisant ici une structure en fonction du type
+ * -Données : un stream ouvert en lecture ,une table de section,un type ,l'entete elf
+ * -Résultat : une structure initailisé de type SymbTab ,L'erreur est géré par essert
+ * **/
+SymbTab *lire_symb_tab_out (FILE *fin,Elf32_Shdr *sectTab,int shtype,Elf32_Ehdr *head,int ndx,int nbs,Elf32_Sym *tabSym);
+
+/**Cette fonction fait presque une duplication d'une table de symbole en initialisant ici une structure en fonction du type
+ ** Cette fonction renvoie les noms de symboles indexés par ndxsect
+ *  -Données : une table de section,un indexe et un stream
+ * **/
+char **recup_nom_tab (Elf32_Shdr *sectTab,int ndxsect,FILE *fin,Elf32_Ehdr *head,Elf32_Sym *symb,int nbs);
+
+/**Cette fonction renvoie le nom d'un symbole à l'indice i
+ * Données : une table de symbole,Une table de section ,un indexsymtab et l'indice du nom cherché
+ * Résultat : un nom de symbole
+ * **/
+char *nom_symbole_ndx (Elf32_Sym *symb,FILE *fin,Elf32_Shdr *sectTab,int index,int i);
+
+/**-Cette fonction écrit la nouvelle table des symbole dans le fichier
+   -Données : un stream ouvert en w,une structure Données et une structure SymbTab
+   -Résultat : la fonction ne renvoie rien
+**/
+void ecris_new_symb_in_file (FILE *fout,Donnees *d,SymbTab *sout);
 
 #endif
