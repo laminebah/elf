@@ -10,7 +10,7 @@
 int ElfId (Elf32_Ehdr * elf_head) {
 	int resultat  = 0;
 	if (elf_head->e_ident[EI_MAG0] != ELFMAG0 || elf_head->e_ident[EI_MAG1] != ELFMAG1 ||
-        elf_head->e_ident[EI_MAG2] != ELFMAG2 || elf_head->e_ident[EI_MAG3] != ELFMAG3)
+        elf_head->e_ident[EI_MAG2] != ELFMAG2 || elf_head->e_ident[EI_MAG3] != ELFMAG3 || elf_head->e_ident[EI_CLASS] != ELFCLASS32)
             resultat = -1;
 	return resultat;
 }
